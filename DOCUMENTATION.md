@@ -76,6 +76,27 @@ Now, tie everything together by modeling the application process itself and crea
 
 - Created Application model with file field so that application_form.xlsx can be uploaded. Configured django settings and urls, so that media is stored in media folder and is served with media url. Implemented logic for filename so that there are no accidental overrides.
 - Created staging tables for Product, RawMaterial, ProductDetail, ProductCategory, SupplyChainCompany, and CertificationBody to keep track of application status and review progress.
+- I'll be using pdfkit and wkhtmltopdf for the pdf generation logic. Since it needs to have wkhtmltopdf installed on the computer, i'll create a docker container with all the files, so that when reviewers check my code, the don't have to install in their computer. Using a base image with wkhtmltopdf installed.
+  '''
+  FROM surnet/alpine-python-wkhtmltopdf:3.12.1-0.12.6-small
+
+# Set working directory
+
+WORKDIR /app
+
+# Copy requirements and install Python dependencies
+
+COPY project/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy project code and data files
+
+COPY . .
+
+# Command to run your application
+
+CMD ["python", "project/manage.py", "runserver", "0.0.0.0:8000"]
+'''
 
 ## 🛠️ Project Infrastructure & Tooling
 

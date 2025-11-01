@@ -1,33 +1,45 @@
-.PHONY: run superuser migrations migrate import-product-categories import-product-details import-raw-materials
+.PHONY: run superuser migrations migrate import-product-categories import-product-details import-raw-materials build stop clean shell
 
 # Configuration
-PYTHON := python3.11
-MANAGE_PY := project/manage.py
-DATA_DIR := /Users/fgs/Desktop/github.com/frangdelsolar/job-hunt/idfl/data_files
+IMAGE_NAME := idfl-app
+CONTAINER_NAME := idfl-container
 
-# File paths
-PRODUCT_CATEGORIES_FILE := $(DATA_DIR)/product_category.xlsx
-PRODUCT_DETAILS_FILE := $(DATA_DIR)/product_detail.xlsx
-RAW_MATERIALS_FILE := $(DATA_DIR)/raw_material.xlsx
+# Main Commands
+run: build
+	docker run -p 8000:8000 --name $(CONTAINER_NAME) $(IMAGE_NAME)
 
-# Commands
-run:
-	$(PYTHON) $(MANAGE_PY) runserver
+build:
+	docker build -t $(IMAGE_NAME) .
 
 superuser:
-	$(PYTHON) $(MANAGE_PY) createsuperuser --username admin
+	docker exec -it $(CONTAINER_NAME) python manage.py createsuperuser --username admin
 
 migrations:
-	$(PYTHON) $(MANAGE_PY) makemigrations
+	docker exec $(CONTAINER_NAME) python manage.py makemigrations
 
 migrate:
-	$(PYTHON) $(MANAGE_PY) migrate
+	docker exec $(CONTAINER_NAME) python manage.py migrate
 
 import-product-categories:
-	$(PYTHON) $(MANAGE_PY) import_product_categories $(PRODUCT_CATEGORIES_FILE)
+	docker exec $(CONTAINER_NAME) python manage.py import_product_categories /app/data_files/product_category.xlsx
 
 import-product-details:
-	$(PYTHON) $(MANAGE_PY) import_product_details $(PRODUCT_DETAILS_FILE)
+	docker exec $(CONTAINER_NAME) python manage.py import_product_details /app/data_files/product_detail.xlsx
 
 import-raw-materials:
-	$(PYTHON) $(MANAGE_PY) import_raw_materials $(RAW_MATERIALS_FILE)
+	docker exec $(CONTAINER_NAME) python manage.py import_raw_materials /app/data_files/raw_material.xlsx
+
+# Utility Commands
+stop:
+	docker stop $(CONTAINER_NAME)
+
+clean: stop
+	docker rm $(CONTAINER_NAME)
+
+shell:
+	docker exec -it $(CONTAINER_NAME) /bin/bash
+
+start:
+	docker start $(CONTAINER_NAME)
+
+restart: stop start
