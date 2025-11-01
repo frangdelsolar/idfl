@@ -6,7 +6,6 @@ from .models import (
     CertificationBody
 )
 
-# We register our models to make them available in django admin site
 admin.site.register(Address)
 admin.site.register(Company)
 admin.site.register(SupplyChainCompany)
