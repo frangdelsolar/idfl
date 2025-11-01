@@ -146,3 +146,10 @@ LOGGING = {
         'level': 'INFO',
     },
 }
+
+
+# URL prefix for media files (files uploaded by users)
+MEDIA_URL = '/media/'
+
+# Absolute file system path to the directory that holds user-uploaded files.
+MEDIA_ROOT = BASE_DIR / 'media'
