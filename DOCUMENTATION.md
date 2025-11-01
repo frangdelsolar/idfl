@@ -51,6 +51,32 @@
 - **Secure Access**: Implemented user authentication checks in all autocomplete querysets
 - **Search Optimization**: Added case-insensitive contains filtering on description fields
 
+<!-- ### 3. Create application models, admin pages and pdf download
+Now, tie everything together by modeling the application process itself and creating an interface for reviewing applications. The following features should be implemented based on the user stories:
+
+1. As Customer Service, I can create applications, supply chain companies, company products based on the received application_form.xlsx, so the review can start.
+2. As a Reviewer, I can approve or reject specific application product is valid or not so that our certificate maintains standards. e.g.:
+    - Valid product composition
+        - Product Catagory:
+            -  Dyed fibers
+        - Raw materials:
+            - Recycled post-consumer glass
+            - Wood
+    - Invalid product composition
+        - Product Catagory:
+            -  Greige yarns
+        - Raw materials:
+            - Recycled post-consumer polyester
+            - Polyethylene
+3. As a Reviewer, I can approve or reject specific application supply chain companies so that our certificate maintains standards.
+4. As a Reviewer, after finishing an application review, I can click a button to download a PDF report listing all approved products and supply chain companies to send to the customer.
+    - You may use wkhtmltopdf (https://wkhtmltopdf.org/downloads.html) or another PDF tool.
+
+**Note: You might want to check [Background & Workflow] section for understanding** -->
+
+- Created Application model with file field so that application_form.xlsx can be uploaded. Configured django settings and urls, so that media is stored in media folder and is served with media url. Implemented logic for filename so that there are no accidental overrides.
+- Created staging tables for Product, RawMaterial, ProductDetail, ProductCategory, SupplyChainCompany, and CertificationBody to keep track of application status and review progress.
+
 ## 🛠️ Project Infrastructure & Tooling
 
 ### Development Environment
@@ -83,12 +109,12 @@ make run
 ```
 
 Access the admin interface at http://localhost:8000/admin.
-NOTE: If you are using Makefile commands, you will need to update the DATA_DIR variable in the Makefile to match your local directory structure, as well as the PYTHON variable to match your Python interpreter path.
+**NOTE:** If you are using Makefile commands, you will need to update the DATA_DIR variable in the Makefile to match your local directory structure, as well as the PYTHON variable to match your Python interpreter path.
 
 ### Known Limitations
 
 - **Data Validation on import:** Pandas **NaN** handling requires fixes in validation logic
-- Logging is not fully implemented
+- **Company data ownership:** Company defines a users that can access the data, but other models do not have company field, nor the forms validate the user association to show, hide according to user rights.
 
 ### Design Decisions
 

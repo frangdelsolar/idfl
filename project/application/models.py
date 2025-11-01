@@ -8,83 +8,122 @@ APPLICATION_FOLDER = 'application_files'
 def application_file_path(instance, filename):
     """
     Generate a unique file path for application files.
-    
-    This function creates a deterministic path structure and uses UUIDs
-    to prevent filename collisions and ensure secure file storage.
-    
-    Args:
-        instance: The Application model instance
-        filename (str): The original filename uploaded by the user
-        
-    Returns:
-        str: A unique file path in the format: 'data/application_files/{uuid}.{ext}'
-    
-    Example:
-        Input: 'document.pdf'
-        Output: 'data/application_files/a1b2c3d4e5f6.pdf'
     """
-    # Extract file extension from original filename
     ext = filename.split('.')[-1]
-    
-    # Generate unique filename using UUID to prevent collisions
     unique_filename = f"{uuid.uuid4().hex}.{ext}"
-    
-    # Construct the full path
     subdirectory = APPLICATION_FOLDER
     return os.path.join('data', subdirectory, unique_filename)
 
 
 class Application(models.Model):
-    """
-    Represents an application submission with associated metadata and file.
-    
-    Tracks the lifecycle of an application through various status states
-    and stores relevant submission information.
-    """
+    """Represents an application submission."""
     
     class Status(models.TextChoices):
-        """Defines possible states of an application throughout its lifecycle."""
         PENDING = 'pending', 'Pending'
         IN_REVIEW = 'in_review', 'In Review'
         APPROVED = 'approved', 'Approved'
         REJECTED = 'rejected', 'Rejected'
     
-    # Basic application information
-    name = models.CharField(
-        max_length=120,
-        help_text="Name of the application or applicant (max 120 characters)"
-    )
-    
-    description = models.TextField(
-        help_text="Detailed description of the application"
-    )
-    
-    # Timestamp tracking
-    submission_date = models.DateTimeField(
-        auto_now_add=True,
-        help_text="Date and time when the application was submitted"
-    )
-    
-    # Application state
-    status = models.CharField(
-        max_length=120,
-        choices=Status.choices,
-        default=Status.PENDING,
-        help_text="Current status of the application in the review process"
-    )
-    
-    # File attachment (optional)
-    file = models.FileField(
-        upload_to=application_file_path,
-        blank=True,
-        null=True,
-        help_text="Optional file attachment related to the application"
-    )
+    name = models.CharField(max_length=120)
+    description = models.TextField()
+    submission_date = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=120, choices=Status.choices, default=Status.PENDING)
+    file = models.FileField(upload_to=application_file_path, blank=True, null=True)
+    rejection_reason = models.TextField(blank=True, null=True)
     
     def __str__(self):
-        """String representation of the Application model."""
         return f"{self.name} - {self.status}"
     
     class Meta:
-        """Metadata options for the Application model."""
         ordering = ['-submission_date'] 
+
+
+class ApplicationCompanyInfo(models.Model):
+    """Staging model for the applicant company."""
+    application = models.OneToOneField(
+        'application.Application',
+        on_delete=models.CASCADE,
+        related_name='company_info',
+        null=False, blank=False
+    )
+    
+    name = models.CharField(max_length=120, null=True, blank=True)
+    address = models.CharField(max_length=120, null=True, blank=True)
+    city = models.CharField(max_length=120, null=True, blank=True)
+    state = models.CharField(max_length=120, null=True, blank=True)
+    zip_code = models.CharField(max_length=120, null=True, blank=True)
+    country = models.CharField(max_length=120, null=True, blank=True)
+
+    is_approved = models.BooleanField(default=False)
+    rejection_reason = models.TextField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Application Company Info (Staging)"
+        verbose_name_plural = "Application Company Info (Staging)"
+
+    def __str__(self):
+        app_name = getattr(self.application, 'name', 'N/A')
+        return f"Info for Application: {app_name} ({self.name})"
+    
+
+class ApplicationSupplyChainPartner(models.Model):
+    """Staging model for a supply chain partner."""
+    application = models.ForeignKey(
+        'application.Application',
+        on_delete=models.CASCADE,
+        related_name='supply_chain_partners',
+        null=False, blank=False
+    )
+
+    name = models.CharField(max_length=120, null=True, blank=True)
+    address = models.CharField(max_length=120, null=True, blank=True)
+    city = models.CharField(max_length=120, null=True, blank=True)
+    state = models.CharField(max_length=120, null=True, blank=True)
+    zip_code = models.CharField(max_length=120, null=True, blank=True)
+    country = models.CharField(max_length=120, null=True, blank=True)
+    
+    is_approved = models.BooleanField(default=False)
+    rejection_reason = models.TextField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Application Supply Chain Partner (Staging)"
+        verbose_name_plural = "Application Supply Chain Partners (Staging)"
+
+    def __str__(self):
+        app_name = getattr(self.application, 'name', 'N/A')
+        return f"Partner: {self.name} for App: {app_name}"
+    
+    
+class ApplicationProduct(models.Model):
+    """Staging model for a product submitted by a supply chain partner."""
+    application = models.ForeignKey(
+        'application.Application',
+        on_delete=models.CASCADE,
+        related_name='products', 
+        null=False, blank=False
+    )
+    
+    supply_chain_partner_name_raw = models.CharField(
+        max_length=120, 
+        null=True, 
+        blank=True
+    )
+
+    product_name = models.CharField(max_length=120, null=True, blank=True)
+    product_category = models.CharField(max_length=120, null=True, blank=True)
+    raw_materials_list = models.TextField(
+        null=True, 
+        blank=True
+    )
+    
+    is_approved = models.BooleanField(default=False)
+    rejection_reason = models.TextField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Application Product (Staging)"
+        verbose_name_plural = "Application Products (Staging)"
+
+    def __str__(self):
+        app_name = getattr(self.application, 'name', 'N/A')
+        partner_name = self.supply_chain_partner_name_raw or 'Unspecified Partner'
+        return f"Product: {self.product_name} by {partner_name} for App: {app_name}"
