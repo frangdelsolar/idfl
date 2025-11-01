@@ -51,52 +51,69 @@
 - **Secure Access**: Implemented user authentication checks in all autocomplete querysets
 - **Search Optimization**: Added case-insensitive contains filtering on description fields
 
-<!-- ### 3. Create application models, admin pages and pdf download
-Now, tie everything together by modeling the application process itself and creating an interface for reviewing applications. The following features should be implemented based on the user stories:
+# Task 3: Create Application Models, Admin Pages and PDF Download System
 
-1. As Customer Service, I can create applications, supply chain companies, company products based on the received application_form.xlsx, so the review can start.
-2. As a Reviewer, I can approve or reject specific application product is valid or not so that our certificate maintains standards. e.g.:
-    - Valid product composition
-        - Product Catagory:
-            -  Dyed fibers
-        - Raw materials:
-            - Recycled post-consumer glass
-            - Wood
-    - Invalid product composition
-        - Product Catagory:
-            -  Greige yarns
-        - Raw materials:
-            - Recycled post-consumer polyester
-            - Polyethylene
-3. As a Reviewer, I can approve or reject specific application supply chain companies so that our certificate maintains standards.
-4. As a Reviewer, after finishing an application review, I can click a button to download a PDF report listing all approved products and supply chain companies to send to the customer.
-    - You may use wkhtmltopdf (https://wkhtmltopdf.org/downloads.html) or another PDF tool.
+## Application Management Architecture
 
-**Note: You might want to check [Background & Workflow] section for understanding** -->
+### Core Application Model
 
-- Created Application model with file field so that application_form.xlsx can be uploaded. Configured django settings and urls, so that media is stored in media folder and is served with media url. Implemented logic for filename so that there are no accidental overrides.
-- Created staging tables for Product, RawMaterial, ProductDetail, ProductCategory, SupplyChainCompany, and CertificationBody to keep track of application status and review progress.
-- I'll be using pdfkit and wkhtmltopdf for the pdf generation logic. Since it needs to have wkhtmltopdf installed on the computer, i'll create a docker container with all the files, so that when reviewers check my code, the don't have to install in their computer. Using a base image with wkhtmltopdf installed.
-  '''
-  FROM surnet/alpine-python-wkhtmltopdf:3.12.1-0.12.6-small
+- **File Upload Integration**: Implemented `Application` model with file field for `application_form.xlsx` uploads, enabling customer service to initiate review processes
+- **Media Configuration**: Configured Django settings and URLs for proper media file storage in `media/` folder with unique filename generation to prevent accidental overrides
+- **Status Tracking**: Built comprehensive status management system to track application lifecycle from submission to completion
 
-# Set working directory
+### Staging Tables System
 
-WORKDIR /app
+- **Data Isolation**: Created dedicated staging tables for Product, RawMaterial, ProductDetail, ProductCategory, SupplyChainCompany, and CertificationBody to maintain application-specific data without affecting master records
+- **Review Progress Tracking**: Implemented approval status fields (`is_approved`) and rejection reasoning across all staging models to support granular reviewer decisions
+- **Data Integrity**: Maintained relationships between staging tables while keeping them separate from production data
 
-# Copy requirements and install Python dependencies
+## Admin Interface for Application Review
 
-COPY project/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+### Customer Service Workflow
 
-# Copy project code and data files
+- **Application Creation**: Enabled customer service to create new applications by uploading Excel forms and entering basic company information
+- **Data Staging**: Provided interface for manual entry of supply chain partners and product compositions based on submitted application data
+- **Inline Management**: Used StackedInline classes for intuitive nested data entry of company info, supply chain partners, and products
 
-COPY . .
+### Reviewer Workflow
 
-# Command to run your application
+- **Granular Approval System**: Implemented individual approval/rejection controls for each supply chain partner and product within an application
+- **Composition Validation**: Built interface for reviewers to validate product compositions against established standards (e.g., approved raw materials for specific product categories)
+- **Bulk Actions**: Added list view actions for batch operations and status management
 
-CMD ["python", "project/manage.py", "runserver", "0.0.0.0:8000"]
-'''
+## PDF Certificate Generation
+
+### Technology Stack
+
+- **PDF Generation**: Integrated `pdfkit` with `wkhtmltopdf` for high-quality PDF certificate generation
+- **Dockerized Environment**: Created containerized solution using `surnet/alpine-python-wkhtmltopdf` base image to eliminate local dependency installation for reviewers
+- **Template System**: Built HTML template infrastructure for customizable certificate design and branding
+
+### Implementation Features
+
+- **One-Click Export**: Added "Download PDF" button in admin list view that generates comprehensive certificates listing all approved products and supply chain partners
+- **Dynamic Content**: Implemented logic to include only approved items in the final certificate output
+- **Professional Formatting**: Designed certificate templates with proper styling, company branding, and authorized signatures
+
+## Workflow Automation
+
+### Completion System
+
+- **Dual-Save Logic**: Implemented "Save as Draft" vs "Complete Application" workflow with appropriate validation and state transitions
+- **Backend Action Triggers**: Created extensible hook system for triggering backend processes upon application completion (notifications, data processing, etc.)
+- **Read-Only Protection**: Automated field and inline locking for completed applications to prevent accidental modifications
+
+### User Experience
+
+- **Visual Status Indicators**: Used color-coded badges and icons to clearly display application status throughout the interface
+- **Action-Based UI**: Contextual buttons that appear/hide based on application state and user permissions
+- **Comprehensive Feedback**: Success/error messaging with appropriate toast notifications for all user actions
+
+### User Management System
+
+- **Role-Based Access Control**: Implemented three distinct user roles (Admin, Customer Service, Reviewer) with granular permissions
+- **Automated User Provisioning**: Created management commands for one-click setup of roles and default users
+- **Secure Authentication**: Integrated with Django's built-in authentication system with staff-level access controls
 
 ## 🛠️ Project Infrastructure & Tooling
 
@@ -108,29 +125,31 @@ CMD ["python", "project/manage.py", "runserver", "0.0.0.0:8000"]
 
 ## 🚀 Quick Start Guide
 
-### Prerequisites
+### Automated Setup (Recommended)
+
+Get started with a single command that handles everything:
 
 ```bash
-# 1. Environment setup
-python3.11 -m venv env
-source env/bin/activate
-pip install -r requirements.txt
-
-# 2. Database setup
-make migrate
-make superuser
-
-# 3. Data import
-make import-product-categories
-make import-product-details
-make import-raw-materials
-
-# 4. Run application
-make run
+# Complete automated setup - builds, migrates, creates users, imports data, and runs
+make init
 ```
 
-Access the admin interface at http://localhost:8000/admin.
-**NOTE:** If you are using Makefile commands, you will need to update the DATA_DIR variable in the Makefile to match your local directory structure, as well as the PYTHON variable to match your Python interpreter path.
+- This automatically creates:
+
+* Docker container with all dependencies pre-installed
+* Database schema with all migrations applied
+* Three user accounts with appropriate roles
+* Sample data imported from Excel files
+
+- Runs application at http://localhost:8000
+
+### User Roles & Permissions
+
+| Role             | Username   | Password   | Capabilities                    |
+| ---------------- | ---------- | ---------- | ------------------------------- |
+| Administrator    | `admin`    | `admin`    | Full system access              |
+| Customer Service | `cservice` | `cservice` | Create and manage applications  |
+| Reviewer         | `reviewer` | `reviewer` | Review and approve applications |
 
 ### Known Limitations
 
@@ -150,3 +169,12 @@ Access the admin interface at http://localhost:8000/admin.
 1. **Autocomplete Strategy:** Selected django-autocomplete-light for its Django Admin integration and performance with large datasets
 2. **Data Integrity:** Used SET_NULL for foreign keys to maintain historical relationships while allowing reference data updates
 3. **Active Record Pattern:** Implemented is_active flags across reference tables to support soft deletion and historical reporting
+
+## 🐳 Dockerization & Development Environment
+
+### Containerized Development Setup
+
+- **Environment Consistency**: Ensures identical development and evaluation environments across all systems
+- **Streamlined Onboarding**: Single-command setup eliminates complex installation procedures
+- **Production Parity**: Development environment mirrors production configuration for reliable testing
+- **Dependency Management**: All system dependencies including PDF generation tools are pre-configured

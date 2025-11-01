@@ -12,8 +12,9 @@ init: build
 	@sleep 3
 	@echo "Applying migrations..."
 	@docker exec $(CONTAINER_NAME) python manage.py migrate
-	@echo "Creating superuser (username: admin, password: admin)..."
-	@echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('admin', 'admin@example.com', 'admin') if not User.objects.filter(username='admin').exists() else None" | docker exec -i $(CONTAINER_NAME) python manage.py shell
+	@echo "Setting up roles and users..."
+	@docker exec $(CONTAINER_NAME) python manage.py setup_roles
+	@docker exec $(CONTAINER_NAME) python manage.py setup_users
 	@echo "Importing product categories..."
 	@docker exec $(CONTAINER_NAME) python manage.py import_product_categories /app/data_files/product_category.xlsx
 	@echo "Importing product details..."
@@ -23,6 +24,8 @@ init: build
 	@echo "Initialization complete!"
 	@echo "Container is running at http://localhost:8000"
 	@echo "Admin credentials: username=admin, password=admin"
+	@echo "Customer Service: username=cservice, password=cservice"
+	@echo "Reviewer: username=reviewer, password=reviewer"
 
 # Main Commands
 run: 

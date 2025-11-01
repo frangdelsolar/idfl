@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from product.utils.raw_material_parser import parse_raw_material_xlsx 
+from product import utils
 
 class Command(BaseCommand):
     """
@@ -41,7 +41,7 @@ class Command(BaseCommand):
         self.stdout.write(f"Starting import from: {file_path}")
 
         try:
-            parse_raw_material_xlsx(file_path)
+            utils.parse_raw_material_xlsx(file_path)
         except FileNotFoundError:
             self.stdout.write(self.style.ERROR(f"File not found: {file_path}"))
             return
