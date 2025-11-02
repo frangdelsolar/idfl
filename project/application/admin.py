@@ -365,7 +365,23 @@ class ApplicationAdmin(admin.ModelAdmin):
                 return False
         
         return super().has_change_permission(request, obj)
+    
+    def save_model(self, request, obj, form, change):
+        """
+        Detect when a file is uploaded and trigger Excel processing
+        """
+        file_uploaded = 'file' in form.changed_data and obj.file
+        
+        # Call parent save first to ensure file is saved
+        super().save_model(request, obj, form, change)
+        
+        if file_uploaded and obj.file:
+            try:
+                utils.process_xlsx_application_form(obj)
+            except Exception as e:
+                self.message_user(request, f"Failed to process Excel file for application: {obj.name}. Error: {e}", level='ERROR')
 
+        return obj
 
 # Register models with custom admin interface
 admin.site.register(Application, ApplicationAdmin)

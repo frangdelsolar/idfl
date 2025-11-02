@@ -109,6 +109,21 @@
 - **Environment Isolation**: Consistent development/production environments
 - **Dependency Management**: Eliminated system-level installations
 
+### Task 4: (Optional) Excel Upload and Background Task Processing
+
+## ✅ Completed: Admin Upload and Application Pre-population (Point 1)
+
+The system now automatically processes uploaded Excel forms to pre-fill the staging tables, significantly reducing manual data entry for the Customer Service role.
+
+- **Workflow**: Customer Service uploads the application file, and upon saving, the staging data (company info, partners, products) is **automatically populated**.
+- **Robust Data Extraction**:
+  - Pandas is used to read and process the three required Excel sheets (`info`, `supply chain company`, `product`).
+  - **Product Aggregation**: The extraction logic uses **forward-filling (ffill)** and **groupby** to correctly associate raw materials with their respective product and supplier, creating a single clean record per product.
+
+## ⚠️ Limitation: Batch Processing (Point 2)
+
+- **Status**: The requirement for **Batch processing** (using a background task queue for file processing) is **Not Yet Implemented**. The current file processing is synchronous and blocking.
+
 ## 🛠️ Project Infrastructure & Tooling
 
 ### Development Environment

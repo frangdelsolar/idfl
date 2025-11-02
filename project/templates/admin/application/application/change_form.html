@@ -1,0 +1,20 @@
+{% extends "admin/change_form.html" %}
+{% load i18n static %}
+
+{% block field_sets %}
+{% if original and original.status == 'pending' or not original %}
+<div class="form-row field-upload-notice">
+    <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 12px; border-radius: 4px; margin-bottom: 20px;">
+        <strong>📁 Excel Upload Available:</strong> 
+        Upload an <code>application_form.xlsx</code> file and save to automatically populate all application data.
+        <br>
+        <a href="{% static 'application/templates/application_form_template.xlsx' %}" 
+           style="color: #007bff; text-decoration: underline; margin-top: 8px; display: inline-block;">
+           📥 Download Excel Template
+        </a>
+    </div>
+</div>
+{% endif %}
+
+{{ block.super }}
+{% endblock %}
