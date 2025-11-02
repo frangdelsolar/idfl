@@ -26,7 +26,7 @@ class Application(models.Model):
     
     name = models.CharField(max_length=120)
     description = models.TextField()
-    submission_date = models.DateTimeField(auto_now_add=True)
+    submission_date = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=120, choices=Status.choices, default=Status.PENDING)
     file = models.FileField(upload_to=application_file_path, blank=True, null=True)
     rejection_reason = models.TextField(blank=True, null=True)
