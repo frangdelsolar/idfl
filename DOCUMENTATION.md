@@ -6,122 +6,116 @@
 
 #### Database Architecture
 
-- **Address Normalization Strategy**: Created dedicated `Address` model to eliminate duplication across `Company`, `SupplyChainCompany`, and `CertificationBody` models, enabling consistent geographical data management
-- **Relationship Design**: Implemented ForeignKey relationships for address references with `SET_NULL` to preserve business data when addresses are updated
-- **Data Integrity**: Added unique constraints on ProductCategory, ProductDetail, and RawMaterial codes to prevent duplicates and ensure reliable identification
-- **Comprehensive Documentation**: Maintained detailed model documentation with business context, usage examples, and string representations
+- **Address Normalization Strategy**: Created dedicated `Address` model to eliminate duplication across `Company`, `SupplyChainCompany`, and `CertificationBody` models
+- **Relationship Design**: Implemented ForeignKey relationships with `SET_NULL` to preserve business data
+- **Data Integrity**: Added unique constraints on codes to prevent duplicates
+- **Comprehensive Documentation**: Maintained detailed model documentation with business context
 
 #### Data Import System
 
-- **Modular Import Framework**: Built three dedicated management commands with separate parsers for each model type to accommodate future schema evolution
-- **Robust Data Processing**: Used pandas and openpyxl for Excel file parsing with proper data type handling and error resilience
-- **Validation Layer**: Implemented basic data validation with comprehensive error handling and duplicate detection
-- **Operational Visibility**: Integrated structured logging for import tracking, progress monitoring, and audit trails
+- **Modular Import Framework**: Built dedicated management commands with separate parsers
+- **Robust Data Processing**: Used pandas and openpyxl with proper error handling
+- **Validation Layer**: Implemented data validation with duplicate detection
+- **Operational Visibility**: Integrated structured logging for audit trails
 
 ### Task 2: Create Product Admin Pages
 
 #### Admin Interface Design
 
-- **Enhanced Product Model**: Added `name` field to Product model to support intuitive list displays and user-friendly identification in admin views
-- **Autocomplete Integration**: Installed and configured django-autocomplete-light (DAL) for efficient large dataset handling
+- **Enhanced Product Model**: Added `name` field for intuitive identification
+- **Autocomplete Integration**: Configured django-autocomplete-light for large datasets
 
 #### Advanced Admin Configuration
 
-**ProductAdmin Customization:**
-
-- **List Display**: Configured to show product name, category description, and detail description with custom methods for related field access
-- **Search Optimization**: Enabled search across product name, category descriptions, and detail descriptions
-- **Inline Management**: Implemented `RawMaterialInline` using TabularInline for intuitive many-to-many relationship management
-
-**Autocomplete Implementation:**
-
-- **Lazy Loading**: Configured DAL autocomplete widgets for `Product.category` and `Product.detail` ForeignKey fields
-- **Filtered Querysets**: Autocomplete views filter to only show `is_active=True` records, preventing selection of inactive items
-- **Multiple Selection**: Enabled autocomplete for raw materials with multi-select capability
-
-**Form Optimization:**
-
-- **Custom ModelForm**: Created `ProductModelForm` with autocomplete widgets replacing standard Select widgets
-- **Field Exclusion**: Removed raw_materials from main form to rely exclusively on inline interface
-- **Inline Autocomplete**: Extended autocomplete to RawMaterial inline through custom `RawMaterialInlineForm`
+- **List Display**: Product name, category, and detail descriptions
+- **Search Optimization**: Cross-field search capabilities
+- **Inline Management**: TabularInline for raw materials management
+- **Autocomplete Widgets**: Lazy loading with filtered querysets
+- **Form Optimization**: Custom ModelForm with autocomplete integration
 
 #### URL Routing & Views
 
-- **Dedicated Autocomplete Endpoints**: Set up separate URL patterns for each autocomplete view
-- **Secure Access**: Implemented user authentication checks in all autocomplete querysets
-- **Search Optimization**: Added case-insensitive contains filtering on description fields
+- **Dedicated Endpoints**: Separate URL patterns for autocomplete views
+- **Secure Access**: User authentication in all querysets
+- **Search Optimization**: Case-insensitive filtering
 
-# Task 3: Create Application Models, Admin Pages and PDF Download System
+### Task 3: Create Application Models, Admin Pages and PDF Download System
 
-## Application Management Architecture
+#### Application Management Architecture
 
-### Core Application Model
+**Core Application Model:**
 
-- **File Upload Integration**: Implemented `Application` model with file field for `application_form.xlsx` uploads, enabling customer service to initiate review processes
-- **Media Configuration**: Configured Django settings and URLs for proper media file storage in `media/` folder with unique filename generation to prevent accidental overrides
-- **Status Tracking**: Built comprehensive status management system to track application lifecycle from submission to completion
+- **File Upload Integration**: Excel form uploads for review initiation
+- **Media Configuration**: UUID-based filename generation
+- **Status Tracking**: Comprehensive lifecycle management
 
-### Staging Tables System
+**Staging Tables System:**
 
-- **Data Isolation**: Created dedicated staging tables for Product, RawMaterial, ProductDetail, ProductCategory, SupplyChainCompany, and CertificationBody to maintain application-specific data without affecting master records
-- **Review Progress Tracking**: Implemented approval status fields (`is_approved`) and rejection reasoning across all staging models to support granular reviewer decisions
-- **Data Integrity**: Maintained relationships between staging tables while keeping them separate from production data
+- **Data Isolation**: Dedicated staging tables for application data
+- **Review Progress Tracking**: Granular approval status and reasoning
+- **Data Integrity**: Separate from production until final approval
 
-## Admin Interface for Application Review
+#### Admin Interface for Application Review
 
-### Customer Service Workflow
+**Customer Service Workflow:**
 
-- **Application Creation**: Enabled customer service to create new applications by uploading Excel forms and entering basic company information
-- **Data Staging**: Provided interface for manual entry of supply chain partners and product compositions based on submitted application data
-- **Inline Management**: Used StackedInline classes for intuitive nested data entry of company info, supply chain partners, and products
+- **Application Creation**: Manual entry through admin interface
+- **Manual Data Entry**: Currently requires manual transcription from Excel forms
+- **Inline Management**: StackedInline with collapsible sections
 
-### Reviewer Workflow
+**Reviewer Workflow:**
 
-- **Granular Approval System**: Implemented individual approval/rejection controls for each supply chain partner and product within an application
-- **Composition Validation**: Built interface for reviewers to validate product compositions against established standards (e.g., approved raw materials for specific product categories)
-- **Bulk Actions**: Added list view actions for batch operations and status management
+- **Granular Approval System**: Individual component approval/rejection
+- **Composition Validation**: Standards-based product validation
+- **Role-Based Permissions**: Status-dependent field editing
 
-## PDF Certificate Generation
+#### PDF Certificate Generation
 
-### Technology Stack
+**Technology Stack:**
 
-- **PDF Generation**: Integrated `pdfkit` with `wkhtmltopdf` for high-quality PDF certificate generation
-- **Dockerized Environment**: Created containerized solution using `surnet/alpine-python-wkhtmltopdf` base image to eliminate local dependency installation for reviewers
-- **Template System**: Built HTML template infrastructure for customizable certificate design and branding
+- **PDF Generation**: `pdfkit` with `wkhtmltopdf` integration
+- **Dockerized Environment**: Specialized container for dependencies
+- **Template System**: Dynamic HTML templates with professional styling
 
-### Implementation Features
+**Implementation Features:**
 
-- **One-Click Export**: Added "Download PDF" button in admin list view that generates comprehensive certificates listing all approved products and supply chain partners
-- **Dynamic Content**: Implemented logic to include only approved items in the final certificate output
-- **Professional Formatting**: Designed certificate templates with proper styling, company branding, and authorized signatures
+- **One-Click Export**: Direct PDF download from admin list
+- **Dynamic Content**: Approved/rejected items with detailed reasons
+- **Professional Formatting**: Branded certificates with status indicators
 
-## Workflow Automation
+#### Workflow Automation
 
-### Completion System
+**Completion System:**
 
-- **Dual-Save Logic**: Implemented "Save as Draft" vs "Complete Application" workflow with appropriate validation and state transitions
-- **Backend Action Triggers**: Created extensible hook system for triggering backend processes upon application completion (notifications, data processing, etc.)
-- **Read-Only Protection**: Automated field and inline locking for completed applications to prevent accidental modifications
+- **Application Completion Logic**: Automated status transition validation
+- **Permanent Record Creation**: Data migration to master tables
+- **Atomic Operations**: Database transactions with rollback
 
-### User Experience
+**User Experience:**
 
-- **Visual Status Indicators**: Used color-coded badges and icons to clearly display application status throughout the interface
-- **Action-Based UI**: Contextual buttons that appear/hide based on application state and user permissions
-- **Comprehensive Feedback**: Success/error messaging with appropriate toast notifications for all user actions
+- **Visual Status Indicators**: Color-coded badges and icons
+- **Action-Based UI**: Contextual buttons by user role
+- **Comprehensive Feedback**: Success/error messaging
 
-### User Management System
+#### User Management System
 
-- **Role-Based Access Control**: Implemented three distinct user roles (Admin, Customer Service, Reviewer) with granular permissions
-- **Automated User Provisioning**: Created management commands for one-click setup of roles and default users
-- **Secure Authentication**: Integrated with Django's built-in authentication system with staff-level access controls
+- **Role-Based Access Control**: Three distinct user roles with granular permissions
+- **Permission Enforcement**: Status and role-based field restrictions
+- **Secure Authentication**: Django authentication with group-based controls
+
+#### Dockerization & Deployment
+
+- **Containerized PDF Generation**: Pre-configured dependencies
+- **Environment Isolation**: Consistent development/production environments
+- **Dependency Management**: Eliminated system-level installations
 
 ## 🛠️ Project Infrastructure & Tooling
 
 ### Development Environment
 
-- **Makefile Automation**: Created comprehensive Makefile with variable-based configuration for consistent project operations
-- **Dependency Management**: Maintained requirements.txt with version-pinned dependencies including django-autocomplete-light
-- **Virtual Environment**: Standardized Python 3.11 virtual environment setup
+- **Makefile Automation**: Variable-based configuration for consistent operations
+- **Dependency Management**: Version-pinned requirements including DAL
+- **Virtual Environment**: Standardized Python 3.11 setup
 
 ## 🚀 Quick Start Guide
 
@@ -134,12 +128,19 @@ Get started with a single command that handles everything:
 make init
 ```
 
+Alternative for local development (requires wkhtmltopdf):
+
+```bash
+make local
+```
+
 - This automatically creates:
 
 * Docker container with all dependencies pre-installed
 * Database schema with all migrations applied
 * Three user accounts with appropriate roles
 * Sample data imported from Excel files
+* Dummy data created for testing
 
 - Runs application at http://localhost:8000
 
@@ -151,10 +152,12 @@ make init
 | Customer Service | `cservice` | `cservice` | Create and manage applications  |
 | Reviewer         | `reviewer` | `reviewer` | Review and approve applications |
 
-### Known Limitations
+## 📋 **Current Limitations & Notes**
 
 - **Data Validation on import:** Pandas **NaN** handling requires fixes in validation logic
 - **Company data ownership:** Company defines a users that can access the data, but other models do not have company field, nor the forms validate the user association to show, hide according to user rights.
+- **Manual Application Creation**: Currently, applications can only be created manually through the admin interface. Automated Excel form processing is not yet implemented
+- **Staging Data Entry**: Customer Service staff must manually transcribe data from submitted Excel forms into the system
 
 ### Design Decisions
 
