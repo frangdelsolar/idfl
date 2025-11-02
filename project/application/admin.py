@@ -305,6 +305,16 @@ class ApplicationAdmin(admin.ModelAdmin):
             )
             
             if all_approved:
+                success = utils.complete_application(obj)
+                if not success:
+                    # If permanent record creation fails, keep it in review for retry
+                    self.message_user(
+                        request, 
+                        f"Application '{obj.name}' approved but failed to create permanent records. Please try again.", 
+                        level='ERROR'
+                    )
+                    return HttpResponseRedirect(reverse('admin:application_application_changelist'))
+                
                 obj.status = 'completed'
                 self.message_user(request, f"Application '{obj.name}' approved and completed")
             else:
