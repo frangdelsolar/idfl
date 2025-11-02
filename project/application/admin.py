@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
@@ -234,7 +234,7 @@ class ApplicationAdmin(admin.ModelAdmin):
 
     def download_actions(self, obj):
         """Display PDF certificate download button for completed applications."""
-        if obj.status == 'completed':
+        if obj.status == 'completed' or obj.status == 'rejected':
             return format_html(
                 '<a class="button" href="{}" style="background: #ff6b35;">📄 Download PDF</a>',
                 reverse('admin:application_application_download_pdf', args=[obj.pk])
@@ -320,18 +320,22 @@ class ApplicationAdmin(admin.ModelAdmin):
     def download_pdf(self, request, object_id):
         """Handle PDF certificate generation and download for completed applications."""
         obj = self.get_object(request, object_id)
-        if obj and obj.status == 'completed':
-            success = utils.generate_pdf_certificate(obj)
-            if not success:
+        if obj and (obj.status == 'completed' or obj.status == 'rejected'):
+            pdf_content = utils.generate_pdf_certificate(obj)
+            if pdf_content:
+                response = HttpResponse(pdf_content, content_type='application/pdf')
+                filename = f"sustainability_certificate_{obj.name.replace(' ', '_')}.pdf"
+                response['Content-Disposition'] = f'attachment; filename="{filename}"'
+                
+                return response
+            else:
                 self.message_user(
                     request, 
                     f"Failed to generate PDF for '{obj.name}'", 
                     level='ERROR'
                 )
-            else:
-                self.message_user(request, f"PDF download triggered for '{obj.name}' - add your logic here")
         else:
-            self.message_user(request, "Certificate only available for completed applications", level='ERROR')
+            self.message_user(request, "Certificate only available for completed or rejected applications", level='ERROR')
         
         return HttpResponseRedirect(reverse('admin:application_application_changelist'))
 
