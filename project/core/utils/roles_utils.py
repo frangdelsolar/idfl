@@ -4,7 +4,8 @@ from application.models import (
     Application, 
     ApplicationCompanyInfo,
     ApplicationSupplyChainPartner,
-    ApplicationProduct
+    ApplicationProduct,
+    BulkSubmission
 )
 
 def setup_customer_service_role():
@@ -13,7 +14,7 @@ def setup_customer_service_role():
     
     Creates Customer Service group with permissions to:
     - All basic CRU (Create, Read, Update) permissions for application models
-    - No delete permissions
+    - CRU permissions for BulkSubmission (no delete)
     
     Returns:
         Group: Customer Service group object
@@ -26,6 +27,7 @@ def setup_customer_service_role():
     company_info_content_type = ContentType.objects.get_for_model(ApplicationCompanyInfo)
     partner_content_type = ContentType.objects.get_for_model(ApplicationSupplyChainPartner)
     product_content_type = ContentType.objects.get_for_model(ApplicationProduct)
+    bulk_submission_content_type = ContentType.objects.get_for_model(BulkSubmission)
     
     # Application permissions (no delete)
     app_add_perm = Permission.objects.get(codename='add_application', content_type=app_content_type)
@@ -47,12 +49,18 @@ def setup_customer_service_role():
     product_change_perm = Permission.objects.get(codename='change_applicationproduct', content_type=product_content_type)
     product_view_perm = Permission.objects.get(codename='view_applicationproduct', content_type=product_content_type)
     
+    # BulkSubmission permissions (CRU - no delete)
+    bulk_add_perm = Permission.objects.get(codename='add_bulksubmission', content_type=bulk_submission_content_type)
+    bulk_change_perm = Permission.objects.get(codename='change_bulksubmission', content_type=bulk_submission_content_type)
+    bulk_view_perm = Permission.objects.get(codename='view_bulksubmission', content_type=bulk_submission_content_type)
+    
     # Assign all permissions to group (no delete permissions)
     all_permissions = [
         app_add_perm, app_change_perm, app_view_perm,
         company_info_add_perm, company_info_change_perm, company_info_view_perm,
         partner_add_perm, partner_change_perm, partner_view_perm,
-        product_add_perm, product_change_perm, product_view_perm
+        product_add_perm, product_change_perm, product_view_perm,
+        bulk_add_perm, bulk_change_perm, bulk_view_perm
     ]
     
     customer_service_group.permissions.add(*all_permissions)
@@ -64,7 +72,7 @@ def setup_reviewer_role():
     Setup Reviewer role with appropriate permissions.
     
     Creates Reviewer group with permissions to:
-    - All CRUD (Create, Read, Update, Delete) permissions for application models
+    - All CRUD (Create, Read, Update, Delete) permissions for ALL models
     
     Returns:
         Group: Reviewer group object
@@ -77,6 +85,7 @@ def setup_reviewer_role():
     company_info_content_type = ContentType.objects.get_for_model(ApplicationCompanyInfo)
     partner_content_type = ContentType.objects.get_for_model(ApplicationSupplyChainPartner)
     product_content_type = ContentType.objects.get_for_model(ApplicationProduct)
+    bulk_submission_content_type = ContentType.objects.get_for_model(BulkSubmission)
     
     # Application permissions (full CRUD)
     app_add_perm = Permission.objects.get(codename='add_application', content_type=app_content_type)
@@ -102,12 +111,19 @@ def setup_reviewer_role():
     product_view_perm = Permission.objects.get(codename='view_applicationproduct', content_type=product_content_type)
     product_delete_perm = Permission.objects.get(codename='delete_applicationproduct', content_type=product_content_type)
     
-    # Assign all permissions to group (including delete)
+    # BulkSubmission permissions (full CRUD)
+    bulk_add_perm = Permission.objects.get(codename='add_bulksubmission', content_type=bulk_submission_content_type)
+    bulk_change_perm = Permission.objects.get(codename='change_bulksubmission', content_type=bulk_submission_content_type)
+    bulk_view_perm = Permission.objects.get(codename='view_bulksubmission', content_type=bulk_submission_content_type)
+    bulk_delete_perm = Permission.objects.get(codename='delete_bulksubmission', content_type=bulk_submission_content_type)
+    
+    # Assign all permissions to group (full CRUD for everything)
     all_permissions = [
         app_add_perm, app_change_perm, app_view_perm, app_delete_perm,
         company_info_add_perm, company_info_change_perm, company_info_view_perm, company_info_delete_perm,
         partner_add_perm, partner_change_perm, partner_view_perm, partner_delete_perm,
-        product_add_perm, product_change_perm, product_view_perm, product_delete_perm
+        product_add_perm, product_change_perm, product_view_perm, product_delete_perm,
+        bulk_add_perm, bulk_change_perm, bulk_view_perm, bulk_delete_perm  # Full CRUD for BulkSubmission
     ]
     
     reviewer_group.permissions.add(*all_permissions)

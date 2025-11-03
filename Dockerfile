@@ -10,6 +10,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy everything
 COPY . .
 
+# Create the media directory first, then copy the file
+RUN mkdir -p /app/project/media/application_files
+COPY data_files /app/project/media/application_files
+
 # Change to project directory and run
 WORKDIR /app/project
 

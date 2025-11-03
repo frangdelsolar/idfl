@@ -109,7 +109,7 @@
 - **Environment Isolation**: Consistent development/production environments
 - **Dependency Management**: Eliminated system-level installations
 
-### Task 4: (Optional) Excel Upload and Background Task Processing
+### Task 4: Excel Upload and Background Task Processing
 
 ## ✅ Completed: Admin Upload and Application Pre-population (Point 1)
 
@@ -120,9 +120,30 @@ The system now automatically processes uploaded Excel forms to pre-fill the stag
   - Pandas is used to read and process the three required Excel sheets (`info`, `supply chain company`, `product`).
   - **Product Aggregation**: The extraction logic uses **forward-filling (ffill)** and **groupby** to correctly associate raw materials with their respective product and supplier, creating a single clean record per product.
 
-## ⚠️ Limitation: Batch Processing (Point 2)
+## ✅ Completed: Bulk Submission Processing with Async Threading (Point 2)
 
-- **Status**: The requirement for **Batch processing** (using a background task queue for file processing) is **Not Yet Implemented**. The current file processing is synchronous and blocking.
+The system now supports **asynchronous bulk submission processing** using Python threading for non-blocking operations.
+
+### Bulk Submission Features Implemented:
+
+#### Core Architecture:
+
+- **BulkSubmission Model**: Centralized management of application batches with status tracking (DRAFT → PROCESSING → SUCCESS/FAIL)
+- **Admin Interface**: Dedicated admin panel for managing bulk submissions with inline applications
+- **Role-based Access Control**:
+  - **Customer Service**: Can create and edit bulk submissions only in DRAFT status
+  - **Reviewer**: Full CRUD access to monitor and manage all submissions
+
+#### Async Processing Implementation:
+
+- **Fire-and-Forget Pattern**: Uses Python `threading` for background processing
+- **Non-Blocking**: Admin interface returns immediately after triggering processing
+- **Simple & Lightweight**: No external dependencies or complex queue systems
+- **Status Auto-Update**: Background thread automatically updates submission status upon completion
+
+#### 🔄 Scalability Considerations:
+
+For production environments with higher loads, consider migrating to Celery + Redis, which provides a full-featured task queue with retries, monitoring, and scaling
 
 ## 🛠️ Project Infrastructure & Tooling
 
@@ -187,6 +208,10 @@ make local
 1. **Autocomplete Strategy:** Selected django-autocomplete-light for its Django Admin integration and performance with large datasets
 2. **Data Integrity:** Used SET_NULL for foreign keys to maintain historical relationships while allowing reference data updates
 3. **Active Record Pattern:** Implemented is_active flags across reference tables to support soft deletion and historical reporting
+
+#### Known Limitations
+
+- **Type hints**: Would have liked to have data type hints in the code.
 
 ## 🐳 Dockerization & Development Environment
 

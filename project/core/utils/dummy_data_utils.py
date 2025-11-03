@@ -4,8 +4,100 @@ from application.models import (
     Application, 
     ApplicationCompanyInfo,
     ApplicationSupplyChainPartner,
-    ApplicationProduct
+    ApplicationProduct, 
+    BulkSubmission
 )
+
+def create_dummy_bulk_submissions():
+    """Create dummy bulk submissions with applications."""
+
+    application_file = "application_files/application_form.xlsx"
+    
+    # Bulk Submission 1: Draft with multiple applications
+    draft_submission = BulkSubmission.objects.create(
+        name="📦 BULK - Q4 Sustainability Applications Batch",
+        description="Quarter 4 sustainability certification applications from various textile companies",
+        status=BulkSubmission.Status.DRAFT
+    )
+    
+    # Create applications for draft submission
+    app1 = Application.objects.create(
+        name="BULK - EcoWear Collective - Fall Collection",
+        description="Sustainable fall fashion line using organic cotton and recycled materials",
+        status=Application.Status.PENDING,
+        bulk_submissions=draft_submission,
+        file=application_file
+    )
+    
+    app2 = Application.objects.create(
+        name="BULK - Green Threads Manufacturing", 
+        description="Bulk application for manufacturing facility certification",
+        status=Application.Status.PENDING,
+        bulk_submissions=draft_submission,
+        file=application_file
+    )
+    
+    # Bulk Submission 2: Processing submission
+    processing_submission = BulkSubmission.objects.create(
+        name="🚀 BULK - Active Processing - Textile Partners",
+        description="Currently processing applications from supply chain partners",
+        status=BulkSubmission.Status.PROCESSING
+    )
+    
+    app3 = Application.objects.create(
+        name="BULK - Sustainable Dye House Ltd.",
+        description="Application for eco-friendly dyeing processes certification",
+        status=Application.Status.IN_REVIEW,
+        bulk_submissions=processing_submission,
+        file=application_file
+    )
+    
+    # Bulk Submission 3: Successful submission
+    success_submission = BulkSubmission.objects.create(
+        name="✅ BULK - Completed - Q3 Approvals",
+        description="Successfully processed and approved Q3 applications",
+        status=BulkSubmission.Status.SUCCESS
+    )
+    
+    app4 = Application.objects.create(
+        name="BULK - Organic Cotton Co-op",
+        description="Organic cotton farming cooperative certification",
+        status=Application.Status.APPROVED,
+        bulk_submissions=success_submission,
+        file=application_file
+    )
+    
+    app5 = Application.objects.create(
+        name="BULK - Recycled Polyester Inc.",
+        description="Post-consumer polyester recycling facility",
+        status=Application.Status.APPROVED, 
+        bulk_submissions=success_submission,
+        file=application_file
+    )
+    
+    # Bulk Submission 4: Failed submission
+    failed_submission = BulkSubmission.objects.create(
+        name="❌ BULK - Failed - Compliance Issues",
+        description="Batch failed due to documentation and compliance problems",
+        status=BulkSubmission.Status.FAIL,
+        error_message="Multiple applications missing required sustainability documentation",
+        error_details={"missing_docs": 3, "compliance_issues": 5}
+    )
+    
+    app6 = Application.objects.create(
+        name="BULK - Problematic Textiles LLC",
+        description="Application with multiple compliance violations",
+        status=Application.Status.REJECTED,
+        bulk_submissions=failed_submission
+        # No file for the rejected application
+    )
+    
+    return [
+        draft_submission,
+        processing_submission, 
+        success_submission,
+        failed_submission
+    ]
 
 def create_to_be_submitted_application():
     """Create a dummy application for Customer Service to submit."""
@@ -236,5 +328,6 @@ def create_dummy_data():
     submitted_app = create_to_be_submitted_application()
     approved_app = create_to_be_approved_application()
     rejected_app = create_to_be_rejected_application()
+    bulk_submissions = create_dummy_bulk_submissions()
     
-    return submitted_app, approved_app, rejected_app
+    return submitted_app, approved_app, rejected_app, bulk_submissions

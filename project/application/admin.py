@@ -8,7 +8,8 @@ from .models import (
     Application, 
     ApplicationCompanyInfo,
     ApplicationSupplyChainPartner,
-    ApplicationProduct
+    ApplicationProduct,
+    BulkSubmission
 )
 from application import utils
 
@@ -307,7 +308,6 @@ class ApplicationAdmin(admin.ModelAdmin):
             if all_approved:
                 success = utils.complete_application(obj)
                 if not success:
-                    # If permanent record creation fails, keep it in review for retry
                     self.message_user(
                         request, 
                         f"Application '{obj.name}' approved but failed to create permanent records. Please try again.", 
@@ -371,8 +371,7 @@ class ApplicationAdmin(admin.ModelAdmin):
         Detect when a file is uploaded and trigger Excel processing
         """
         file_uploaded = 'file' in form.changed_data and obj.file
-        
-        # Call parent save first to ensure file is saved
+
         super().save_model(request, obj, form, change)
         
         if file_uploaded and obj.file:
@@ -382,9 +381,127 @@ class ApplicationAdmin(admin.ModelAdmin):
                 self.message_user(request, f"Failed to process Excel file for application: {obj.name}. Error: {e}", level='ERROR')
 
         return obj
+    
+class ApplicationInline(admin.StackedInline):
+    model = Application
+    extra = 1
+    readonly_fields = ['submission_date']
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'description', 'file')
+        }),
+        ('Status', {
+            'fields': ('status', 'submission_date'),
+            'classes': ('collapse',)
+        })
+    )
+
+class BulkSubmissionAdmin(admin.ModelAdmin):
+    list_display = ['name', 'status', 'created_at']
+    list_filter = ['status', 'created_at']
+    search_fields = ['name', 'description']
+    readonly_fields = ['created_at', 'updated_at']
+    inlines = [ApplicationInline]
+    
+    fieldsets = (
+        ('Submission Details', {
+            'fields': ('name', 'description')
+        }),
+        ('Status & Timing', {
+            'fields': ('status', ('created_at', 'updated_at'))
+        }),
+        ('Errors', {
+            'fields': ('error_message', 'error_details'),
+            'classes': ('collapse',)
+        })
+    )
+
+    def get_readonly_fields(self, request, obj=None):
+        """Apply role-based field permissions"""
+        readonly_fields = list(super().get_readonly_fields(request, obj) or [])
+        
+        if request.user.groups.filter(name='Reviewer').exists():
+            # Reviewer can only read, not edit
+            readonly_fields.extend(['name', 'description', 'status', 'error_message', 'error_details'])
+        elif request.user.groups.filter(name='Customer Service').exists():
+            # Customer Service can only edit when status is DRAFT
+            if obj and obj.status != BulkSubmission.Status.DRAFT:
+                readonly_fields.extend(['name', 'description', 'status', 'error_message', 'error_details'])
+        
+        return readonly_fields
+
+    def get_inline_instances(self, request, obj=None):
+        """Apply role-based permissions to inline instances"""
+        inline_instances = []
+        for inline_class in self.inlines:
+            inline = inline_class(self.model, self.admin_site)
+            
+            if request.user.groups.filter(name='Reviewer').exists():
+                # Reviewer - read only
+                inline.readonly_fields = list(getattr(inline, 'readonly_fields', [])) + [
+                    'name', 'description', 'file', 'status', 'submission_date'
+                ]
+                inline.can_delete = False
+                inline.max_num = 0
+            elif request.user.groups.filter(name='Customer Service').exists():
+                # Customer Service - only editable when status is DRAFT
+                if obj and obj.status != BulkSubmission.Status.DRAFT:
+                    inline.readonly_fields = list(getattr(inline, 'readonly_fields', [])) + [
+                        'name', 'description', 'file', 'status', 'submission_date'
+                    ]
+                    inline.can_delete = False
+                    inline.max_num = 0
+            
+            inline_instances.append(inline)
+        
+        return inline_instances
+
+    def has_change_permission(self, request, obj=None):
+        """Role-based change permissions"""
+        if request.user.groups.filter(name='Reviewer').exists():
+            return False
+        
+        if (request.user.groups.filter(name='Customer Service').exists() and 
+            obj and obj.status != BulkSubmission.Status.DRAFT):
+            return False
+            
+        return super().has_change_permission(request, obj)
+
+    def has_add_permission(self, request):
+        """Role-based add permissions"""
+        if request.user.groups.filter(name='Reviewer').exists():
+            return False
+        return super().has_add_permission(request)
+
+    def has_delete_permission(self, request, obj=None):
+        """Role-based delete permissions"""
+        if request.user.groups.filter(name='Reviewer').exists():
+            return False
+        
+        if (request.user.groups.filter(name='Customer Service').exists() and 
+            obj and obj.status != BulkSubmission.Status.DRAFT):
+            return False
+            
+        return super().has_delete_permission(request, obj)
+
+    def save_model(self, request, obj, form, change):
+        """
+        Custom save logic for BulkSubmission
+        """
+        super().save_model(request, obj, form, change)
+        
+        obj.status = BulkSubmission.Status.PROCESSING
+        obj.save()
+        
+        utils.process_bulk_submission_async(obj.id)
+
 
 # Register models with custom admin interface
 admin.site.register(Application, ApplicationAdmin)
 admin.site.register(ApplicationCompanyInfo)
 admin.site.register(ApplicationSupplyChainPartner)
 admin.site.register(ApplicationProduct)
+admin.site.register(BulkSubmission, BulkSubmissionAdmin)
+
+

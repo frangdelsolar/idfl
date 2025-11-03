@@ -23,7 +23,7 @@ class Command(BaseCommand):
         self.stdout.write("Creating dummy application data...")
 
         try:
-            submitted_app, approved_app, rejected_app = utils.create_dummy_data()
+            submitted_app, approved_app, rejected_app, bulk_submissions = utils.create_dummy_data()
         except Exception as e:
             self.stdout.write(self.style.ERROR(f"Failed to create dummy data: {e}"))
             return
@@ -32,4 +32,5 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"  - {submitted_app.name} (Status: {submitted_app.status})"))
         self.stdout.write(self.style.SUCCESS(f"  - {approved_app.name} (Status: {approved_app.status})"))
         self.stdout.write(self.style.SUCCESS(f"  - {rejected_app.name} (Status: {rejected_app.status})"))
+        self.stdout.write(self.style.SUCCESS(f"✓ Created {len(bulk_submissions)} Bulk Submissions"))
         self.stdout.write(self.style.SUCCESS('Successfully created dummy application data!'))

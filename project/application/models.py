@@ -30,7 +30,14 @@ class Application(models.Model):
     status = models.CharField(max_length=120, choices=Status.choices, default=Status.PENDING)
     file = models.FileField(upload_to=application_file_path, blank=True, null=True)
     rejection_reason = models.TextField(blank=True, null=True)
-    
+    bulk_submissions = models.ForeignKey(
+        'application.BulkSubmission', 
+        on_delete=models.SET_NULL,
+        related_name='applications',
+        null=True,
+        blank=True
+    )    
+
     def __str__(self):
         return f"{self.name} - {self.status}"
     
@@ -127,3 +134,38 @@ class ApplicationProduct(models.Model):
         app_name = getattr(self.application, 'name', 'N/A')
         partner_name = self.supply_chain_partner_name_raw or 'Unspecified Partner'
         return f"Product: {self.product_name} by {partner_name} for App: {app_name}"
+    
+
+class BulkSubmission(models.Model):
+    """Represents a bulk submission that can contain multiple applications."""
+    
+    class Status(models.TextChoices):
+        DRAFT = 'draft', 'Draft'
+        PROCESSING = 'processing', 'Processing'
+        SUCCESS = 'success', 'Success'
+        FAIL = 'fail', 'Fail'
+    
+    # Submission metadata
+    name = models.CharField(max_length=120, help_text="Name for this bulk submission")
+    description = models.TextField(blank=True, null=True, help_text="Optional description of this submission")
+    
+    # Status and timestamps
+    status = models.CharField(
+        max_length=20, 
+        choices=Status.choices, 
+        default=Status.DRAFT
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    # Error information for failed submissions
+    error_message = models.TextField(blank=True, null=True)
+    error_details = models.JSONField(blank=True, null=True, help_text="Detailed error information")
+    
+    def __str__(self):
+        return f"{self.name} - {self.status} - {self.created_at.strftime('%Y-%m-%d')}"
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "Bulk Submission"
+        verbose_name_plural = "Bulk Submissions"
