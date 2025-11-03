@@ -42,6 +42,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # 3rd party apps
+    'rest_framework',
+    'rest_framework.authtoken',
+
     # local apps
     'core',
     'customer',
@@ -154,8 +158,24 @@ LOGGING = {
 }
 
 
-# URL prefix for media files (files uploaded by users)
+# URL prefix for media files 
 MEDIA_URL = '/media/'
 
 # Absolute file system path to the directory that holds user-uploaded files.
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Django REST Framework
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
+# CORS for external API access
+CORS_ALLOWED_ORIGINS = [
+    "*",
+]

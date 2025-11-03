@@ -145,6 +145,197 @@ The system now supports **asynchronous bulk submission processing** using Python
 
 For production environments with higher loads, consider migrating to Celery + Redis, which provides a full-featured task queue with retries, monitoring, and scaling
 
+## Task 5: API
+
+Login to get token
+
+'''bash
+curl -X POST http://localhost:8000/api-token-auth/ \
+ -H "Content-Type: application/x-www-form-urlencoded" \
+ -d "username=admin&password=admin" \
+ --cookie-jar cookies.txt
+'''
+
+'''json
+{
+"token": "e019708bc09cfefca7b00b76ac0076ea7d86e20b"
+}
+'''
+
+Now you can use the token to make authenticated requests
+
+'''bash
+curl -X GET http://localhost:8000/api/applications/ \
+ -H "Accept: application/json" \
+ -H "Authorization: Token YOUR_AUTH_TOKEN"
+'''
+
+'''json
+
+{
+    "detail": "Authentication credentials were not provided."
+}
+'''
+
+GET
+'''json
+[
+    {
+        "id": 3,
+        "name": "❌ TO BE REJECTED - BioTech Fabrics Application",
+        "description": "Application with several compliance issues including non-approved materials.",
+        "submission_date": "2025-11-03T13:12:37.828837Z",
+        "status": "in_review",
+        "file": null,
+        "rejection_reason": null,
+        "company_info": {
+            "id": 3,
+            "name": "BioTech Fabrics Corp.",
+            "address": "321 Innovation Drive",
+            "city": "San Francisco",
+            "state": "California",
+            "zip_code": "94107",
+            "country": "United States",
+            "is_approved": true,
+            "rejection_reason": null
+        },
+        "supply_chain_partners": [
+            {
+                "id": 5,
+                "name": "Algae Fiber Producers",
+                "address": "654 Bio Park Road",
+                "city": "San Diego",
+                "state": "California",
+                "zip_code": "92121",
+                "country": "United States",
+                "is_approved": true,
+                "rejection_reason": null
+            },
+            {
+                "id": 6,
+                "name": "❌ Uncertified Textiles Inc.",
+                "address": "999 Non-Compliant Road",
+                "city": "Problem City",
+                "state": "Texas",
+                "zip_code": "75001",
+                "country": "United States",
+                "is_approved": false,
+                "rejection_reason": "Supplier lacks proper sustainability certifications."
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "name": "✅ TO BE APPROVED - EcoFiber Textiles Application",
+        "description": "Well-prepared application with all sustainable materials and proper documentation.",
+        "submission_date": "2025-11-03T13:12:37.824203Z",
+        "status": "in_review",
+        "file": null,
+        "rejection_reason": null,
+        "company_info": {
+            "id": 2,
+            "name": "EcoFiber Textiles Inc.",
+            "address": "123 Green Street",
+            "city": "Portland",
+            "state": "Oregon",
+            "zip_code": "97205",
+            "country": "United States",
+            "is_approved": true,
+            "rejection_reason": null
+        },
+        "supply_chain_partners": [
+            {
+                "id": 3,
+                "name": "Sustainable Yarn Co.",
+                "address": "456 Eco Avenue",
+                "city": "Seattle",
+                "state": "Washington",
+                "zip_code": "98101",
+                "country": "United States",
+                "is_approved": true,
+                "rejection_reason": null
+            },
+            {
+                "id": 4,
+                "name": "Green Weavers Ltd.",
+                "address": "789 Renewable Road",
+                "city": "Vancouver",
+                "state": "British Columbia",
+                "zip_code": "V6B 1A1",
+                "country": "Canada",
+                "is_approved": true,
+                "rejection_reason": null
+            }
+        ]
+    },
+    ...
+]
+'''
+
+POST
+'''bash
+curl -X POST http://localhost:8000/api/applications/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Token e019708bc09cfefca7b00b76ac0076ea7d86e20b" \
+  -d '{
+    "name": "API DEMO - Eco Fabrics Inc Application",
+    "description": "Sustainable textile company - Submitted via REST API",
+    "company_info": {
+      "name": "API DEMO - Eco Fabrics Inc",
+      "address": "123 API Integration Street",
+      "city": "Portland",
+      "state": "Oregon",
+      "zip_code": "97205",
+      "country": "United States"
+    },
+    "supply_chain_partners": [
+      {
+        "name": "API DEMO - Organic Cotton Co-op",
+        "address": "456 RESTful Road",
+        "city": "Austin",
+        "state": "Texas",
+        "zip_code": "73301",
+        "country": "United States",
+        "products": [
+          {
+            "supply_chain_partner_name_raw": "API DEMO - Organic Cotton Co-op",
+            "product_name": "API DEMO - Organic Cotton T-Shirt",
+            "product_category": "Apparel",
+            "raw_materials_list": "Organic cotton, Natural dyes, API-submitted"
+          },
+          {
+            "supply_chain_partner_name_raw": "API DEMO - Organic Cotton Co-op",
+            "product_name": "API DEMO - Recycled Denim Jeans", 
+            "product_category": "Bottoms",
+            "raw_materials_list": "Recycled denim, Organic cotton, REST-created"
+          }
+        ]
+      },
+      {
+        "name": "API DEMO - Sustainable Dye House",
+        "address": "789 JSON Avenue",
+        "city": "Seattle", 
+        "state": "Washington",
+        "zip_code": "98101",
+        "country": "United States",
+        "products": [
+          {
+            "supply_chain_partner_name_raw": "API DEMO - Sustainable Dye House",
+            "product_name": "API DEMO - Plant-Dyed Scarf",
+            "product_category": "Accessories",
+            "raw_materials_list": "Organic silk, Plant-based dyes, HTTP POST"
+          }
+        ]
+      }
+    ]
+  }'
+'''
+
+response
+'''json
+{"id":11,"name":"API DEMO - Eco Fabrics Inc Application","description":"Sustainable textile company - Submitted via REST API","submission_date":null,"status":"pending","file":null,"rejection_reason":null,"company_info":{"id":5,"name":"API DEMO - Eco Fabrics Inc","address":"123 API Integration Street","city":"Portland","state":"Oregon","zip_code":"97205","country":"United States","is_approved":false,"rejection_reason":null},"supply_chain_partners":[{"id":9,"name":"API DEMO - Organic Cotton Co-op","address":"456 RESTful Road","city":"Austin","state":"Texas","zip_code":"73301","country":"United States","is_approved":false,"rejection_reason":null},{"id":10,"name":"API DEMO - Sustainable Dye House","address":"789 JSON Avenue","city":"Seattle","state":"Washington","zip_code":"98101","country":"United States","is_approved":false,"rejection_reason":null}]}
+'''
+
 ## 🛠️ Project Infrastructure & Tooling
 
 ### Development Environment
