@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # 3rd party apps
     'rest_framework',
     'rest_framework.authtoken',
+    'drf_spectacular',
 
     # local apps
     'core',
@@ -173,9 +174,25 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 # CORS for external API access
 CORS_ALLOWED_ORIGINS = [
     "*",
 ]
+
+# Django REST Framework Spectacular - API documentation
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Product Certification API',
+    'DESCRIPTION': 'Exercise project: API for managing product certification applications and workflow.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayRequestDuration': True,
+    },
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SCHEMA_PATH_PREFIX': '/api/',
+}

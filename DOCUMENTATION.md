@@ -1,282 +1,253 @@
-# Project Status
+# Coding Exercise — Product Certification Web App (Django) - Progress Report
 
-## ✅ Completed Tasks
+by **Francisco Javier Gonzalez del Solar** - 高子安
 
-### Task 1: Create Customer Models, Product Models and Seed Initial Data
+This project implements a comprehensive Django web application for managing product certification workflows, enabling companies to apply for sustainability certifications through both manual and automated processes. The system supports Excel-based submissions, REST API integrations, and role-based review workflows with PDF certificate generation for approved applications.
 
-#### Database Architecture
+## Index
 
-- **Address Normalization Strategy**: Created dedicated `Address` model to eliminate duplication across `Company`, `SupplyChainCompany`, and `CertificationBody` models
-- **Relationship Design**: Implemented ForeignKey relationships with `SET_NULL` to preserve business data
-- **Data Integrity**: Added unique constraints on codes to prevent duplicates
-- **Comprehensive Documentation**: Maintained detailed model documentation with business context
+- [Coding Exercise — Product Certification Web App (Django) - Progress Report](#coding-exercise--product-certification-web-app-django---progress-report)
+  - [Index](#index)
+  - [Quick Start](#quick-start)
+  - [Project Structure](#project-structure)
+    - [🗂️ Core Components](#️-core-components)
+      - [Data \& Configuration](#data--configuration)
+      - [Development \& Deployment](#development--deployment)
+      - [Django Apps](#django-apps)
+  - [✅ Tasks Completed](#-tasks-completed)
+    - [Task 1: Create Customer Models, Product Models and Seed Initial Data - ✅ Completed](#task-1-create-customer-models-product-models-and-seed-initial-data----completed)
+      - [Core Models Created](#core-models-created)
+      - [Data Import System](#data-import-system)
+      - [Database Design](#database-design)
+    - [Task 2: Create Product Admin Pages - ✅ Completed](#task-2-create-product-admin-pages----completed)
+      - [Admin Interface](#admin-interface)
+      - [Autocomplete System](#autocomplete-system)
+    - [Task 3: Create Application Models, Admin Pages and PDF Download System - ✅ Completed](#task-3-create-application-models-admin-pages-and-pdf-download-system----completed)
+      - [Application Workflow](#application-workflow)
+      - [Admin Interface](#admin-interface-1)
+      - [PDF Certificate Generation](#pdf-certificate-generation)
+      - [User Management](#user-management)
+      - [🐳 Dockerization \& Deployment](#-dockerization--deployment)
+    - [Task 4: Excel Upload and Background Task Processing - ✅ Completed](#task-4-excel-upload-and-background-task-processing----completed)
+      - [Excel Upload \& Auto-Population](#excel-upload--auto-population)
+      - [Bulk Submission System](#bulk-submission-system)
+      - [Background Processing](#background-processing)
+      - [🔄 Scalability Ready](#-scalability-ready)
+    - [Task 5: Expose API Endpoints - ✅ Completed](#task-5-expose-api-endpoints----completed)
+      - [REST API with Authentication](#rest-api-with-authentication)
+      - [API Features](#api-features)
+      - [Comprehensive Documentation](#comprehensive-documentation)
+      - [Example Usage](#example-usage)
+      - [📚 API Documentation](#-api-documentation)
+  - [📝 Notes \& Limitations](#-notes--limitations)
+    - [Current Constraints](#current-constraints)
+    - [Technical Debt](#technical-debt)
+  - [🎯 Final Thoughts](#-final-thoughts)
+
+## Quick Start
+
+1. Clone the repository:
+
+    ```bash
+    git clone git@github.com:frangdelsolar/idfl.git
+    ```
+
+2. Navigate to the project directory:
+
+    ```bash
+    cd idfl
+    ```
+
+3. Run setup and project:
+
+    a. With docker:
+
+    ```bash
+    make docker
+    ```
+
+    b. Without docker (needs wkhtmltopdf):
+
+    ```bash
+    make local
+    ```
+
+4. Automatic Setup will perform the following tasks:
+    - Docker container with all dependencies
+    - Database migrations applied
+    - Three user roles created
+    - Sample data imported from Excel files
+    - Dummy test data generated
+5. Access the admin at: `http://localhost:8000/admin`
+6. Use these credentials to login:
+
+    a. Superuser: `admin`/`admin`
+    b. Customer Service: `cservice`/`cservice`
+    c. Reviewer: `reviewer`/`reviewer`
+
+## Project Structure
+
+The project is structured as follows:
+
+### 🗂️ Core Components
+
+#### Data & Configuration
+
+-   `data_files/` - Excel templates & sample data
+-   `project/project/` - Django settings & URLs
+
+#### Development & Deployment
+
+-   `Makefile` - Automation for setup, testing, deployment
+-   `Dockerfile` - Containerized environment
+-   `requirements.txt` - Python dependencies
+
+#### Django Apps
+
+-   `application/` - Certification workflows, PDF generation, APIs
+-   `product/` - Product models, data import commands
+-   `customer/` - Company & user management
+-   `core/` - User roles, utilities, setup commands
+
+## ✅ Tasks Completed
+
+| Task                    | Status  | Key Features                     |
+| ----------------------- | ------- | -------------------------------- |
+| 1. Data Models & Import | ✅ Done | Excel imports, normalized models |
+| 2. Admin Interface      | ✅ Done | Autocomplete, inline editing     |
+| 3. Application Workflow | ✅ Done | PDF generation, review process   |
+| 4. Excel Processing     | ✅ Done | Bulk upload, async processing    |
+| 5. REST API             | ✅ Done | Token auth, Swagger docs         |
+
+### Task 1: Create Customer Models, Product Models and Seed Initial Data - ✅ Completed
+
+#### Core Models Created
+
+-   **Company** - Customer companies with user associations
+-   **SupplyChainCompany** - Supplier/partner companies
+-   **CertificationBody** - Certification organizations
+-   **Product** with Category, Detail, and RawMaterial relationships
 
 #### Data Import System
 
-- **Modular Import Framework**: Built dedicated management commands with separate parsers
-- **Robust Data Processing**: Used pandas and openpyxl with proper error handling
-- **Validation Layer**: Implemented data validation with duplicate detection
-- **Operational Visibility**: Integrated structured logging for audit trails
+-   **Management commands** to import Excel data from provided files
+-   **Product categories, details, and raw materials** loaded automatically
+-   **Duplicate prevention** with proper error handling
 
-### Task 2: Create Product Admin Pages
+#### Database Design
 
-#### Admin Interface Design
+-   **Normalized Address model** to eliminate duplication
+-   **Foreign keys with SET_NULL** to preserve business data
+-   **Unique constraints** to maintain data integrity
 
-- **Enhanced Product Model**: Added `name` field for intuitive identification
-- **Autocomplete Integration**: Configured django-autocomplete-light for large datasets
+### Task 2: Create Product Admin Pages - ✅ Completed
 
-#### Advanced Admin Configuration
+#### Admin Interface
 
-- **List Display**: Product name, category, and detail descriptions
-- **Search Optimization**: Cross-field search capabilities
-- **Inline Management**: TabularInline for raw materials management
-- **Autocomplete Widgets**: Lazy loading with filtered querysets
-- **Form Optimization**: Custom ModelForm with autocomplete integration
+-   **Product list view** with name, category, and detail display
+-   **Inline raw materials management** for easy editing
+-   **Search and filtering** across key product fields
 
-#### URL Routing & Views
+#### Autocomplete System
 
-- **Dedicated Endpoints**: Separate URL patterns for autocomplete views
-- **Secure Access**: User authentication in all querysets
-- **Search Optimization**: Case-insensitive filtering
+-   **Lazy-loading dropdowns** for product categories and details
+-   **Filtered querysets** that exclude inactive items
+-   **Performance optimized** for large datasets
 
-### Task 3: Create Application Models, Admin Pages and PDF Download System
+### Task 3: Create Application Models, Admin Pages and PDF Download System - ✅ Completed
 
-#### Application Management Architecture
+#### Application Workflow
 
-**Core Application Model:**
+-   **Complete application lifecycle** from submission to certification
+-   **Staging tables system** for review data isolation
+-   **Role-based workflows** for Customer Service and Reviewer roles
 
-- **File Upload Integration**: Excel form uploads for review initiation
-- **Media Configuration**: UUID-based filename generation
-- **Status Tracking**: Comprehensive lifecycle management
+#### Admin Interface
 
-**Staging Tables System:**
-
-- **Data Isolation**: Dedicated staging tables for application data
-- **Review Progress Tracking**: Granular approval status and reasoning
-- **Data Integrity**: Separate from production until final approval
-
-#### Admin Interface for Application Review
-
-**Customer Service Workflow:**
-
-- **Application Creation**: Manual entry through admin interface
-- **Manual Data Entry**: Currently requires manual transcription from Excel forms
-- **Inline Management**: StackedInline with collapsible sections
-
-**Reviewer Workflow:**
-
-- **Granular Approval System**: Individual component approval/rejection
-- **Composition Validation**: Standards-based product validation
-- **Role-Based Permissions**: Status-dependent field editing
+-   **Customer** Service: Create applications and manage submissions
+-   **Reviewer**: Granular approval/rejection of products and suppliers
+-   **Status tracking** with visual indicators and permissions
 
 #### PDF Certificate Generation
 
-**Technology Stack:**
+-   **One-click PDF export** from admin interface
+-   **Professional templates** with approved/rejected items
+-   **Dynamic content** with detailed rejection reasons
 
-- **PDF Generation**: `pdfkit` with `wkhtmltopdf` integration
-- **Dockerized Environment**: Specialized container for dependencies
-- **Template System**: Dynamic HTML templates with professional styling
+#### User Management
 
-**Implementation Features:**
+-   **Three distinct roles**: Admin, Customer Service, Reviewer
+-   **Role-based permissions** and field restrictions
+-   **Secure authentication** with group controls
 
-- **One-Click Export**: Direct PDF download from admin list
-- **Dynamic Content**: Approved/rejected items with detailed reasons
-- **Professional Formatting**: Branded certificates with status indicators
+#### 🐳 Dockerization & Deployment
 
-#### Workflow Automation
+-   **Containerized PDF Generation**: Pre-configured dependencies
+-   **Environment Isolation**: Consistent development/production environments
+-   **Dependency Management**: Eliminated system-level installations
 
-**Completion System:**
+### Task 4: Excel Upload and Background Task Processing - ✅ Completed
 
-- **Application Completion Logic**: Automated status transition validation
-- **Permanent Record Creation**: Data migration to master tables
-- **Atomic Operations**: Database transactions with rollback
+#### Excel Upload & Auto-Population
 
-**User Experience:**
+-   **Automated Excel processing** - Uploads pre-fill staging tables automatically
+-   **Pandas data extraction** from info, supply chain company, and product sheets
+-   **Smart product aggregation** using forward-filling and groupby for clean records
 
-- **Visual Status Indicators**: Color-coded badges and icons
-- **Action-Based UI**: Contextual buttons by user role
-- **Comprehensive Feedback**: Success/error messaging
+#### Bulk Submission System
 
-#### User Management System
+-   **BulkSubmission model** for batch processing with status tracking
+-   **Async processing** with Python threading for non-blocking operations
+-   **Role-based access** - Customer Service creates, Reviewer monitors all
 
-- **Role-Based Access Control**: Three distinct user roles with granular permissions
-- **Permission Enforcement**: Status and role-based field restrictions
-- **Secure Authentication**: Django authentication with group-based controls
+#### Background Processing
 
-#### Dockerization & Deployment
+-   **Fire-and-forget pattern** for immediate admin interface response
+-   **Status auto-updates** when background processing completes
+-   **Lightweight solution** without external dependencies
 
-- **Containerized PDF Generation**: Pre-configured dependencies
-- **Environment Isolation**: Consistent development/production environments
-- **Dependency Management**: Eliminated system-level installations
+#### 🔄 Scalability Ready
 
-### Task 4: Excel Upload and Background Task Processing
+-   **Production-ready architecture** that can upgrade to Celery + Redis
+-   **Modular design** for easy task queue migration
 
-## ✅ Completed: Admin Upload and Application Pre-population (Point 1)
+### Task 5: Expose API Endpoints - ✅ Completed
 
-The system now automatically processes uploaded Excel forms to pre-fill the staging tables, significantly reducing manual data entry for the Customer Service role.
+#### REST API with Authentication
 
-- **Workflow**: Customer Service uploads the application file, and upon saving, the staging data (company info, partners, products) is **automatically populated**.
-- **Robust Data Extraction**:
-  - Pandas is used to read and process the three required Excel sheets (`info`, `supply chain company`, `product`).
-  - **Product Aggregation**: The extraction logic uses **forward-filling (ffill)** and **groupby** to correctly associate raw materials with their respective product and supplier, creating a single clean record per product.
+-   **Token-based authentication** using Django REST Framework
+-   **Secure endpoints** requiring valid tokens for access
+-   **Complete CRUD operations** for applications and related data
 
-## ✅ Completed: Bulk Submission Processing with Async Threading (Point 2)
+#### API Features
 
-The system now supports **asynchronous bulk submission processing** using Python threading for non-blocking operations.
+-   **GET/POST applications** with nested company and partner data
+-   **Detailed response structures** with approval status and relationships
+-   **Programmatic submission** eliminating manual Excel processing
 
-### Bulk Submission Features Implemented:
+#### Comprehensive Documentation
 
-#### Core Architecture:
+-   **Interactive Swagger UI** at `/api/docs/`
+-   **JSON schema** for automated client generation
+-   **Live testing** with authentication support
 
-- **BulkSubmission Model**: Centralized management of application batches with status tracking (DRAFT → PROCESSING → SUCCESS/FAIL)
-- **Admin Interface**: Dedicated admin panel for managing bulk submissions with inline applications
-- **Role-based Access Control**:
-  - **Customer Service**: Can create and edit bulk submissions only in DRAFT status
-  - **Reviewer**: Full CRUD access to monitor and manage all submissions
+#### Example Usage
 
-#### Async Processing Implementation:
-
-- **Fire-and-Forget Pattern**: Uses Python `threading` for background processing
-- **Non-Blocking**: Admin interface returns immediately after triggering processing
-- **Simple & Lightweight**: No external dependencies or complex queue systems
-- **Status Auto-Update**: Background thread automatically updates submission status upon completion
-
-#### 🔄 Scalability Considerations:
-
-For production environments with higher loads, consider migrating to Celery + Redis, which provides a full-featured task queue with retries, monitoring, and scaling
-
-## Task 5: API
-
-Login to get token
-
-'''bash
+```bash
+# Get authentication token
 curl -X POST http://localhost:8000/api-token-auth/ \
- -H "Content-Type: application/x-www-form-urlencoded" \
- -d "username=admin&password=admin" \
- --cookie-jar cookies.txt
-'''
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=admin&password=admin"
 
-'''json
-{
-"token": "e019708bc09cfefca7b00b76ac0076ea7d86e20b"
-}
-'''
-
-Now you can use the token to make authenticated requests
-
-'''bash
+# Get all applications
 curl -X GET http://localhost:8000/api/applications/ \
- -H "Accept: application/json" \
- -H "Authorization: Token YOUR_AUTH_TOKEN"
-'''
+  -H "Accept: application/json" \
+  -H "Authorization: Token YOUR_AUTH_TOKEN"
 
-'''json
-
-{
-    "detail": "Authentication credentials were not provided."
-}
-'''
-
-GET
-'''json
-[
-    {
-        "id": 3,
-        "name": "❌ TO BE REJECTED - BioTech Fabrics Application",
-        "description": "Application with several compliance issues including non-approved materials.",
-        "submission_date": "2025-11-03T13:12:37.828837Z",
-        "status": "in_review",
-        "file": null,
-        "rejection_reason": null,
-        "company_info": {
-            "id": 3,
-            "name": "BioTech Fabrics Corp.",
-            "address": "321 Innovation Drive",
-            "city": "San Francisco",
-            "state": "California",
-            "zip_code": "94107",
-            "country": "United States",
-            "is_approved": true,
-            "rejection_reason": null
-        },
-        "supply_chain_partners": [
-            {
-                "id": 5,
-                "name": "Algae Fiber Producers",
-                "address": "654 Bio Park Road",
-                "city": "San Diego",
-                "state": "California",
-                "zip_code": "92121",
-                "country": "United States",
-                "is_approved": true,
-                "rejection_reason": null
-            },
-            {
-                "id": 6,
-                "name": "❌ Uncertified Textiles Inc.",
-                "address": "999 Non-Compliant Road",
-                "city": "Problem City",
-                "state": "Texas",
-                "zip_code": "75001",
-                "country": "United States",
-                "is_approved": false,
-                "rejection_reason": "Supplier lacks proper sustainability certifications."
-            }
-        ]
-    },
-    {
-        "id": 2,
-        "name": "✅ TO BE APPROVED - EcoFiber Textiles Application",
-        "description": "Well-prepared application with all sustainable materials and proper documentation.",
-        "submission_date": "2025-11-03T13:12:37.824203Z",
-        "status": "in_review",
-        "file": null,
-        "rejection_reason": null,
-        "company_info": {
-            "id": 2,
-            "name": "EcoFiber Textiles Inc.",
-            "address": "123 Green Street",
-            "city": "Portland",
-            "state": "Oregon",
-            "zip_code": "97205",
-            "country": "United States",
-            "is_approved": true,
-            "rejection_reason": null
-        },
-        "supply_chain_partners": [
-            {
-                "id": 3,
-                "name": "Sustainable Yarn Co.",
-                "address": "456 Eco Avenue",
-                "city": "Seattle",
-                "state": "Washington",
-                "zip_code": "98101",
-                "country": "United States",
-                "is_approved": true,
-                "rejection_reason": null
-            },
-            {
-                "id": 4,
-                "name": "Green Weavers Ltd.",
-                "address": "789 Renewable Road",
-                "city": "Vancouver",
-                "state": "British Columbia",
-                "zip_code": "V6B 1A1",
-                "country": "Canada",
-                "is_approved": true,
-                "rejection_reason": null
-            }
-        ]
-    },
-    ...
-]
-'''
-
-POST
-'''bash
+# Submit new application
 curl -X POST http://localhost:8000/api/applications/ \
   -H "Content-Type: application/json" \
-  -H "Authorization: Token e019708bc09cfefca7b00b76ac0076ea7d86e20b" \
+  -H "Authorization: Token YOUR_AUTH_TOKEN" \
   -d '{
     "name": "API DEMO - Eco Fabrics Inc Application",
     "description": "Sustainable textile company - Submitted via REST API",
@@ -301,114 +272,39 @@ curl -X POST http://localhost:8000/api/applications/ \
             "supply_chain_partner_name_raw": "API DEMO - Organic Cotton Co-op",
             "product_name": "API DEMO - Organic Cotton T-Shirt",
             "product_category": "Apparel",
-            "raw_materials_list": "Organic cotton, Natural dyes, API-submitted"
-          },
-          {
-            "supply_chain_partner_name_raw": "API DEMO - Organic Cotton Co-op",
-            "product_name": "API DEMO - Recycled Denim Jeans", 
-            "product_category": "Bottoms",
-            "raw_materials_list": "Recycled denim, Organic cotton, REST-created"
-          }
-        ]
-      },
-      {
-        "name": "API DEMO - Sustainable Dye House",
-        "address": "789 JSON Avenue",
-        "city": "Seattle", 
-        "state": "Washington",
-        "zip_code": "98101",
-        "country": "United States",
-        "products": [
-          {
-            "supply_chain_partner_name_raw": "API DEMO - Sustainable Dye House",
-            "product_name": "API DEMO - Plant-Dyed Scarf",
-            "product_category": "Accessories",
-            "raw_materials_list": "Organic silk, Plant-based dyes, HTTP POST"
+            "raw_materials_list": "Organic cotton, Natural dyes"
           }
         ]
       }
     ]
   }'
-'''
-
-response
-'''json
-{"id":11,"name":"API DEMO - Eco Fabrics Inc Application","description":"Sustainable textile company - Submitted via REST API","submission_date":null,"status":"pending","file":null,"rejection_reason":null,"company_info":{"id":5,"name":"API DEMO - Eco Fabrics Inc","address":"123 API Integration Street","city":"Portland","state":"Oregon","zip_code":"97205","country":"United States","is_approved":false,"rejection_reason":null},"supply_chain_partners":[{"id":9,"name":"API DEMO - Organic Cotton Co-op","address":"456 RESTful Road","city":"Austin","state":"Texas","zip_code":"73301","country":"United States","is_approved":false,"rejection_reason":null},{"id":10,"name":"API DEMO - Sustainable Dye House","address":"789 JSON Avenue","city":"Seattle","state":"Washington","zip_code":"98101","country":"United States","is_approved":false,"rejection_reason":null}]}
-'''
-
-## 🛠️ Project Infrastructure & Tooling
-
-### Development Environment
-
-- **Makefile Automation**: Variable-based configuration for consistent operations
-- **Dependency Management**: Version-pinned requirements including DAL
-- **Virtual Environment**: Standardized Python 3.11 setup
-
-## 🚀 Quick Start Guide
-
-### Automated Setup (Recommended)
-
-Get started with a single command that handles everything:
-
-```bash
-# Complete automated setup - builds, migrates, creates users, imports data, and runs
-make init
 ```
 
-Alternative for local development (requires wkhtmltopdf):
+#### 📚 API Documentation
 
-```bash
-make local
-```
+-   [Swagger UI](http://localhost:8000/api/docs/)
+-   [JSON Schema](http://localhost:8000/api/schema/)
 
-- This automatically creates:
+## 📝 Notes & Limitations
 
-* Docker container with all dependencies pre-installed
-* Database schema with all migrations applied
-* Three user accounts with appropriate roles
-* Sample data imported from Excel files
-* Dummy data created for testing
+### Current Constraints
 
-- Runs application at http://localhost:8000
+-   **Data validation** improvements needed for Excel imports
+-   **User-company associations** not fully enforced in all views
+-   **Basic async processing** using threading (upgradable to Celery)
 
-### User Roles & Permissions
+### Technical Debt
 
-| Role             | Username   | Password   | Capabilities                    |
-| ---------------- | ---------- | ---------- | ------------------------------- |
-| Administrator    | `admin`    | `admin`    | Full system access              |
-| Customer Service | `cservice` | `cservice` | Create and manage applications  |
-| Reviewer         | `reviewer` | `reviewer` | Review and approve applications |
+-   **Type hints** - Limited type annotations in code
+-   **Test coverage** - No test coverage
+-   **Error handling** - Some edge cases need better coverage
 
-## 📋 **Current Limitations & Notes**
+## 🎯 Final Thoughts
 
-- **Data Validation on import:** Pandas **NaN** handling requires fixes in validation logic
-- **Company data ownership:** Company defines a users that can access the data, but other models do not have company field, nor the forms validate the user association to show, hide according to user rights.
-- **Manual Application Creation**: Currently, applications can only be created manually through the admin interface. Automated Excel form processing is not yet implemented
-- **Staging Data Entry**: Customer Service staff must manually transcribe data from submitted Excel forms into the system
+This was a genuinely engaging project to work on - building a complete certification platform from scratch presented interesting architectural challenges and allowed me to design a robust system with real-world applicability.
 
-### Design Decisions
+I want to acknowledge that much of the code was created with AI assistance, which served as an incredibly productive pair-programming partner. However, I actively supervised every single line of code - reviewing, testing, and refining the output - just as I would when leading a development team in a professional environment.
 
-#### Architecture choices
+The scope of implementing all five tasks (including optional API and background processing features) within a reasonable timeframe would have been significantly more challenging without this tool. It allowed me to focus on system architecture, user experience, and business logic rather than getting bogged down in boilerplate code.
 
-1. **Separate import functions:** Maintained individual parsers for each model to accommodate future schema differences.
-2. **Address Normalization:** Created dedicated Address model to reduce duplication and improve scalability.
-3. **Configuration Management:** Centralized file paths and commands in Makefile for easier maintenance.
-
-#### Technical Implementation
-
-1. **Autocomplete Strategy:** Selected django-autocomplete-light for its Django Admin integration and performance with large datasets
-2. **Data Integrity:** Used SET_NULL for foreign keys to maintain historical relationships while allowing reference data updates
-3. **Active Record Pattern:** Implemented is_active flags across reference tables to support soft deletion and historical reporting
-
-#### Known Limitations
-
-- **Type hints**: Would have liked to have data type hints in the code.
-
-## 🐳 Dockerization & Development Environment
-
-### Containerized Development Setup
-
-- **Environment Consistency**: Ensures identical development and evaluation environments across all systems
-- **Streamlined Onboarding**: Single-command setup eliminates complex installation procedures
-- **Production Parity**: Development environment mirrors production configuration for reliable testing
-- **Dependency Management**: All system dependencies including PDF generation tools are pre-configured
+The end result is a fully functional, well-documented application that demonstrates comprehensive understanding of Django, REST APIs, and enterprise workflow design - exactly what was requested in the exercise.
