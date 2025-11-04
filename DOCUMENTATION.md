@@ -140,6 +140,13 @@ The project is structured as follows:
 -   **Foreign keys with SET_NULL** to preserve business data
 -   **Unique constraints** to maintain data integrity
 
+**_Demo_**
+
+-   Navigate to `http://localhost:8000/admin`
+-   Login with credentials: `admin`/`admin`
+-   You can see the initial data imported from the Excel files.
+-   Additionally you can see the logs for the import process during the setup process.
+
 ### Task 2: Create Product Admin Pages - ✅ Completed
 
 #### Admin Interface
@@ -153,6 +160,12 @@ The project is structured as follows:
 -   **Lazy-loading dropdowns** for product categories and details
 -   **Filtered querysets** that exclude inactive items
 -   **Performance optimized** for large datasets
+
+**_Demo_**
+
+-   Navigate to `http://localhost:8000/admin`
+-   Login with credentials: `admin`/`admin`
+-   You can see the autocomplete dropdowns and the search feature in action.
 
 ### Task 3: Create Application Models, Admin Pages and PDF Download System - ✅ Completed
 
@@ -185,6 +198,12 @@ The project is structured as follows:
 -   **Containerized PDF Generation**: Pre-configured dependencies
 -   **Environment Isolation**: Consistent development/production environments
 -   **Dependency Management**: Eliminated system-level installations
+
+**_Demo_**
+
+-   Navigate to `http://localhost:8000/admin`
+-   Login with credentials: `admin`/`admin`
+-   You can see the application workflow and PDF generation in action.
 
 ### Task 4: Excel Upload and Background Task Processing - ✅ Completed
 

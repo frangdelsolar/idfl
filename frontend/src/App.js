@@ -1,15 +1,14 @@
-import './global.css';
+import './index.css';
 import { ApiProvider } from './context/ApiContext';
-
-import DebugApp from './layouts/debug';
+import { BrowserRouter } from 'react-router-dom';
+import AppRoutes from './AppRoutes';
 
 function App() {
     return (
         <ApiProvider>
-            <div className="App">
-                <h1>Product Certification</h1>
-                <DebugApp />
-            </div>
+            <BrowserRouter>
+                <AppRoutes />
+            </BrowserRouter>
         </ApiProvider>
     );
 }
