@@ -1,4 +1,8 @@
-.PHONY: docker docker-init local-init migrations migrate build stop clean shell start restart
+.PHONY: frontend docker docker-init local-init migrations migrate build stop clean shell start restart
+
+# Frontend Commands
+frontend:
+	cd frontend && npm install && npm run start
 
 # Configuration
 IMAGE_NAME := idfl-app

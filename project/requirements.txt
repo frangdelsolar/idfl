@@ -5,3 +5,4 @@ django-autocomplete-light==3.12.1
 pdfkit==1.0.0
 djangorestframework==3.16.1
 drf-spectacular==0.29.0
+django-cors-headers==4.9.0x

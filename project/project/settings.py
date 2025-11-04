@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'drf_spectacular',
+    'corsheaders',
 
     # local apps
     'core',
@@ -55,6 +56,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -178,9 +180,8 @@ REST_FRAMEWORK = {
 }
 
 # CORS for external API access
-CORS_ALLOWED_ORIGINS = [
-    "*",
-]
+CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOWED_ORIGINS = ['*']
 
 # Django REST Framework Spectacular - API documentation
 SPECTACULAR_SETTINGS = {
