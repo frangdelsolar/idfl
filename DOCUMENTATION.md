@@ -66,7 +66,7 @@ This project implements a comprehensive Django web application for managing prod
     make docker
     ```
 
-    b. Without docker (needs wkhtmltopdf):
+    b. Without docker (needs `wkhtmltopdf` installed):
 
     ```bash
     make local
@@ -81,9 +81,9 @@ This project implements a comprehensive Django web application for managing prod
 5. Access the admin at: `http://localhost:8000/admin`
 6. Use these credentials to login:
 
-    a. Superuser: `admin`/`admin`
-    b. Customer Service: `cservice`/`cservice`
-    c. Reviewer: `reviewer`/`reviewer`
+    - Superuser: `admin`/`admin`
+    - Customer Service: `cservice`/`cservice`
+    - Reviewer: `reviewer`/`reviewer`
 
 ## Project Structure
 
@@ -292,12 +292,14 @@ curl -X POST http://localhost:8000/api/applications/ \
 -   **Data validation** improvements needed for Excel imports
 -   **User-company associations** not fully enforced in all views
 -   **Basic async processing** using threading (upgradable to Celery)
+-   **Logging** there's much more logging than needed. It's just for demo purposes.
 
 ### Technical Debt
 
 -   **Type hints** - Limited type annotations in code
 -   **Test coverage** - No test coverage
 -   **Error handling** - Some edge cases need better coverage
+-   **Database** - Maybe move to PostgresQL for better performance
 
 ## 🎯 Final Thoughts
 

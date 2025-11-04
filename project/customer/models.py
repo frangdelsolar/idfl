@@ -1,8 +1,5 @@
 from django.db import models
 
-# null=True -> db can store null value in the column
-# blank=True -> form can accept empty value in the field
-
 class Address(models.Model):
     """
     Comprehensive geographical address model.
@@ -42,8 +39,7 @@ class Address(models.Model):
     )
     
     class Meta: 
-        verbose_name_plural = "Addresses" # We improve pluralization
-
+        verbose_name_plural = "Addresses" 
     def __str__(self):
         """Human-readable representation of the full address."""
         return f'{self.address}, {self.city}, {self.state}, {self.country}'
