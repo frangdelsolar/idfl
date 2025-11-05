@@ -1,8 +1,12 @@
 import { Outlet } from 'react-router-dom';
-import { Box, Container, CssBaseline } from '@mui/material';
+import { Box, CssBaseline } from '@mui/material';
 import Header from './components/Header';
 import Footer from './components/Footer';
 
+/**
+ * Main application layout component providing consistent structure across all pages
+ * Features header navigation, main content area, and footer in a flexbox layout
+ */
 function MainLayout() {
     return (
         <>
@@ -17,17 +21,17 @@ function MainLayout() {
             >
                 <Header />
 
-                {/* Main Content */}
                 <Box
                     component="main"
                     sx={{
                         flexGrow: 1,
-                        py: 3,
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
                     }}
                 >
-                    <Container maxWidth="lg">
-                        <Outlet />
-                    </Container>
+                    <Outlet />
                 </Box>
 
                 <Footer />

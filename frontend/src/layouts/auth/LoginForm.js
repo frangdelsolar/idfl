@@ -9,11 +9,13 @@ import {
     Alert,
     CircularProgress,
     Container,
-    Card,
-    CardContent,
 } from '@mui/material';
 import { Lock as LockIcon } from '@mui/icons-material';
 
+/**
+ * Login form component with authentication handling
+ * Provides username/password fields with loading states and error handling
+ */
 const LoginForm = () => {
     const { auth } = useApi();
     const [username, setUsername] = useState('');
@@ -36,50 +38,6 @@ const LoginForm = () => {
             setLoading(false);
         }
     };
-
-    if (auth.isAuthenticated) {
-        return (
-            <Container component="main" maxWidth="sm">
-                <Box
-                    sx={{
-                        marginTop: 8,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                    }}
-                >
-                    <Card sx={{ width: '100%', p: 3 }}>
-                        <CardContent sx={{ textAlign: 'center' }}>
-                            <Typography
-                                component="h1"
-                                variant="h4"
-                                color="success.main"
-                                gutterBottom
-                            >
-                                Welcome!
-                            </Typography>
-                            <Typography
-                                variant="body1"
-                                color="text.secondary"
-                                paragraph
-                            >
-                                You are successfully logged in.
-                            </Typography>
-                            <Button
-                                variant="contained"
-                                color="error"
-                                size="large"
-                                onClick={auth.logout}
-                                sx={{ mt: 2 }}
-                            >
-                                Logout
-                            </Button>
-                        </CardContent>
-                    </Card>
-                </Box>
-            </Container>
-        );
-    }
 
     return (
         <Container component="main" maxWidth="xs">
