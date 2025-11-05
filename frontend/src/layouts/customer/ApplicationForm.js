@@ -19,6 +19,7 @@ import {
     EMPTY_PARTNER_STATE,
     EMPTY_PRODUCT_STATE,
 } from '../../constants/applicationForm';
+import ApplicationSuccess from './ApplicationSuccess';
 
 /**
  * Main application form component for product certification submissions
@@ -30,6 +31,7 @@ const ApplicationForm = () => {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [formData, setFormData] = useState(EMPTY_APPLICATION_STATE);
+    const [creationResponse, setCreationResponse] = useState(null);
 
     const handleApplicationChange = (field, value) => {
         setFormData((prev) => ({
@@ -183,6 +185,7 @@ const ApplicationForm = () => {
         event.preventDefault();
         setError(null);
         setSuccess(null);
+        setCreationResponse(null);
 
         if (!validateForm()) return;
 
@@ -207,6 +210,7 @@ const ApplicationForm = () => {
             const response = await applications.createApplication(
                 submissionData
             );
+            setCreationResponse(response);
             setSuccess('Application submitted successfully!');
             setFormData(EMPTY_APPLICATION_STATE);
         } catch (err) {
@@ -239,10 +243,8 @@ const ApplicationForm = () => {
                         {error}
                     </Alert>
                 )}
-                {success && (
-                    <Alert severity="success" sx={{ mb: 3 }}>
-                        {success}
-                    </Alert>
+                {success && creationResponse && (
+                    <ApplicationSuccess responseData={creationResponse} />
                 )}
 
                 <Box

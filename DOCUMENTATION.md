@@ -37,7 +37,14 @@ This project implements a comprehensive Django web application for managing prod
       - [REST API with Authentication](#rest-api-with-authentication)
       - [API Features](#api-features)
       - [Comprehensive Documentation](#comprehensive-documentation)
-      - [Example Usage](#example-usage)
+    - [Task 6: Customer-Facing Web Interface - ✅ Completed](#task-6-customer-facing-web-interface----completed)
+      - [Frontend Architecture](#frontend-architecture)
+      - [Customer Service Features](#customer-service-features)
+      - [Customer Application Portal](#customer-application-portal)
+      - [Authentication \& Security](#authentication--security)
+      - [User Experience](#user-experience)
+      - [Technical Implementation:](#technical-implementation)
+      - [Limitations \& Future Improvements:](#limitations--future-improvements)
       - [📚 API Documentation](#-api-documentation)
   - [📝 Notes \& Limitations](#-notes--limitations)
     - [Current Constraints](#current-constraints)
@@ -84,6 +91,7 @@ This project implements a comprehensive Django web application for managing prod
     - Superuser: `admin`/`admin`
     - Customer Service: `cservice`/`cservice`
     - Reviewer: `reviewer`/`reviewer`
+    - Customer: `customer`/`customer`
 
 ## Project Structure
 
@@ -250,7 +258,9 @@ The project is structured as follows:
 -   **JSON schema** for automated client generation
 -   **Live testing** with authentication support
 
-#### Example Usage
+**_Demo_**
+
+-   Run curl commands to test the API endpoints
 
 ```bash
 # Get authentication token
@@ -298,6 +308,66 @@ curl -X POST http://localhost:8000/api/applications/ \
     ]
   }'
 ```
+
+### Task 6: Customer-Facing Web Interface - ✅ Completed
+
+#### Frontend Architecture
+
+-   **React Application** with Material-UI components for modern, responsive design
+-   **Role-based routing** with authentication guards for secure access
+-   **API integration** with comprehensive service layer for backend communication
+
+#### Customer Service Features
+
+-   **Customer Profile Creation** - Service agents can create customer accounts with company associations
+-   **Streamlined workflow** - Automated user creation with Customer role assignment
+-   **Success notifications** - Detailed response display with user credentials and role information
+
+#### Customer Application Portal
+
+-   **Dynamic form system** - Multi-section application form with nested data structures
+-   **Real-time validation** - Comprehensive field validation with user-friendly error messages
+-   **Supply chain management** - Dynamic partner and product addition/removal capabilities
+
+#### Authentication & Security
+
+-   **Token-based authentication** - Secure API communication with token persistence
+-   **Role detection system** - Automatic role assignment based on username patterns
+-   **Protected routes** - RoleGuard component ensures proper access control
+
+#### User Experience
+
+-   **Two-column login layout** - Credentials banner and login form side by side
+-   **Role-specific guidance** - Post-login instructions tailored to user role
+-   **Responsive design** - Mobile-friendly interface with proper breakpoints
+
+#### Technical Implementation:
+
+-   React hooks for state management
+-   Material-UI component library
+-   Context API for authentication state
+-   React Router for navigation
+-   Axios for API communication
+
+#### Limitations & Future Improvements:
+
+-   **Role Detection**: Currently uses username pattern matching (mock implementation for demo)
+-   **State Management**: Basic React state - upgradable to Redux for complex applications
+-   **Testing**: No test coverage implemented
+-   **Type Safety**: JavaScript only - TypeScript migration recommended for production
+
+**_Demo_**
+
+```bash
+make frontend
+```
+
+-   Navigate to [http://localhost:3000/](http://localhost:3000/)
+
+-   Login with credentials
+
+*   Customer Service: `cservice`/`cservice`
+*   Customer: `customer`/`customer`
 
 #### 📚 API Documentation
 

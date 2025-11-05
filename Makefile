@@ -44,6 +44,7 @@ docker-init: build
 	@echo "Admin credentials: username=admin, password=admin"
 	@echo "Customer Service: username=cservice, password=cservice"
 	@echo "Reviewer: username=reviewer, password=reviewer"
+	@echo "Customer: username=customer, password=customer"
 
 build:
 	docker build -t $(IMAGE_NAME) .
@@ -97,6 +98,10 @@ local-init:
 	@echo "   👩‍⚖️ REVIEWER (Approve/Reject Applications):"
 	@echo "   👤 Username: reviewer"
 	@echo "   🔑 Password: reviewer"
+	@echo ""
+	@echo "   👨‍💼 CUSTOMER (Submit Applications):"
+	@echo "   👤 Username: customer" 
+	@echo "   🔑 Password: customer"
 	@echo ""
 	@echo "4. Demo Workflow:"
 	@echo "   • Login as 'cservice' → Submit '📝 TO BE SUBMITTED' application"
