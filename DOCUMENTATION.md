@@ -158,7 +158,7 @@ The project is structured as follows:
 
 -   Navigate to `http://localhost:8000/admin`
 -   Login with credentials: `admin`/`admin`
--   You can see the initial data imported from the Excel files.
+-   You can see the initial data imported from the Excel files in the Product tables.
 -   Additionally you can see the logs for the import process during the setup process.
 
 ### Task 2: Create Product Admin Pages - ✅ Completed
@@ -179,7 +179,7 @@ The project is structured as follows:
 
 -   Navigate to `http://localhost:8000/admin`
 -   Login with credentials: `admin`/`admin`
--   You can see the autocomplete dropdowns and the search feature in action.
+-   You can see the autocomplete dropdowns and the search feature in action in the Add Product page.
 
 ### Task 3: Create Application Models, Admin Pages and PDF Download System - ✅ Completed
 
@@ -213,11 +213,34 @@ The project is structured as follows:
 -   **Environment Isolation**: Consistent development/production environments
 -   **Dependency Management**: Eliminated system-level installations
 
-**_Demo_**
+**_Demo - Application Workflow_**
+
+**Step 1: Submit Application as Customer Service**
 
 -   Navigate to `http://localhost:8000/admin`
+-   Login with credentials: `cservice`/`cservice`
+-   Go to Applications → Click "Add Application"
+-   Fill the form and save, or use existing application: `📝 TO BE SUBMITTED - Fresh Start Apparel Application`
+-   Click "Submit Application" to send to Reviewer
+
+**Step 2: Review Application as Reviewer**
+
+-   Log out and login with credentials: `reviewer`/`reviewer`
+-   Go to Applications → Open the submitted application
+-   Review each item, mark as Approved/Rejected with reasons
+-   Click "Save" then return to application list
+-   Click "Complete Application" to finalize
+
+**Step 3: Verify Results as Admin**
+
 -   Login with credentials: `admin`/`admin`
--   You can see the application workflow and PDF generation in action.
+-   Check that staging data has been transferred to production tables
+
+**Step 4: Download Certificate as Customer Service**
+
+-   Login with credentials: `cservice`/`cservice`
+-   Open the completed application
+-   Click "Download PDF" to get the certificate
 
 ### Task 4: Excel Upload and Background Task Processing - ✅ Completed
 
@@ -244,6 +267,20 @@ The project is structured as follows:
 -   **Production-ready architecture** that can upgrade to Celery + Redis
 -   **Modular design** for easy task queue migration
 
+**_Demo - Bulk Excel Processing_**
+
+**What to expect:** The background process takes ~1 minute to complete. You'll see the status change from "Processing" → "Completed".
+
+**Steps:**
+
+-   Navigate to `http://localhost:8000/admin`
+-   Login with credentials: `cservice`/`cservice`
+-   Go to BulkSubmissions → "Add Bulk Submission"
+-   Fill the form and save, or use existing: `📦 BULK - Q4 Sustainability Applications Batch`
+-   Open the submission and click "Save" - status changes to "Processing"
+-   **Wait 1 minute** then refresh to see status change to "Completed"
+-   Check Applications table to see the newly created applications
+
 ### Task 5: Expose API Endpoints - ✅ Completed
 
 #### REST API with Authentication
@@ -266,7 +303,8 @@ The project is structured as follows:
 
 **_Demo_**
 
--   Run curl commands to test the API endpoints
+-   Run curl commands to test the API endpoints. Remember to replace `YOUR_AUTH_TOKEN` with a valid token. You can get one running the first curl command.
+-   Check responses and status codes.
 
 ```bash
 # Get authentication token
@@ -362,18 +400,35 @@ curl -X POST http://localhost:8000/api/applications/ \
 -   **Testing**: No test coverage implemented
 -   **Type Safety**: JavaScript only - TypeScript migration recommended for production
 
-**_Demo_**
+**_Demo - Customer Web Interface_**
+**Prerequisite:** Ensure the backend is running on port 8000
+
+**Setup:**
 
 ```bash
+# From project root, start the frontend
 make frontend
 ```
 
+-   This command will initialize the frontend dependencies and start the development server.
 -   Navigate to [http://localhost:3000/](http://localhost:3000/)
 
--   Login with credentials
+**1. Customer Service Role**
 
-*   Customer Service: `cservice`/`cservice`
-*   Customer: `customer`/`customer`
+-   Login: `cservice`/`cservice`
+-   Click `Customer Service` in the navigation bar.
+-   Fill the form to create a new customer.
+-   Username must start with `customer_` to create a Customer user. Otherwise, use `customer`/`customer`.
+-   Password will be username.
+-   Navigate to `Customer` in the navigation bar. You should see an `Unauthorized` message.
+
+**2. Customer Role**
+
+-   Login: `customer`/`customer` (or use newly created credentials)
+-   Click `Customer` in the navigation bar.
+-   Fill out tthe multi-section form to create a new application.
+-   Submit and see confirmation
+-   Navigate to `Customer Service` in the navigation bar. You should see an `Unauthorized` message.
 
 #### 📚 API Documentation
 
