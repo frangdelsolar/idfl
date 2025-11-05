@@ -181,7 +181,6 @@ REST_FRAMEWORK = {
 
 # CORS for external API access
 CORS_ALLOW_ALL_ORIGINS = True
-# CORS_ALLOWED_ORIGINS = ['*']
 
 # Django REST Framework Spectacular - API documentation
 SPECTACULAR_SETTINGS = {

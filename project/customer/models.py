@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Address(models.Model):
     """
@@ -135,3 +136,39 @@ class CertificationBody(models.Model):
     def __str__(self):
         """Name-based identification."""
         return self.name
+    
+class CustomerProfile(models.Model):
+    """
+    Extended profile information for customer users.
+    
+    Links Django users to their company and provides additional
+    customer-specific information.
+    """
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='customer_profile',
+        help_text="The Django user account associated with this customer profile."
+    )
+    company = models.ForeignKey(
+        'customer.Company',
+        on_delete=models.CASCADE,
+        related_name='customer_profiles',
+        help_text="The company this customer user belongs to."
+    )
+    phone_number = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True,
+        help_text="Primary contact phone number for the customer."
+    )
+
+    class Meta:
+        verbose_name = "Customer Profile"
+        verbose_name_plural = "Customer Profiles"
+        ordering = ['company', 'user__username']
+
+    def __str__(self):
+        """Human-readable representation of the customer profile."""
+        return f"{self.user.username} - {self.company.name}"
+

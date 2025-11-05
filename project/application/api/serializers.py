@@ -114,7 +114,10 @@ class ApplicationSerializer(serializers.ModelSerializer):
         company_info_data = validated_data.pop('company_info')
         supply_chain_partners_data = validated_data.pop('supply_chain_partners')
         
-        application = Application.objects.create(**validated_data)
+        application = Application.objects.create(
+            **validated_data,
+            status=Application.Status.IN_REVIEW
+        )
         
         ApplicationCompanyInfo.objects.create(
             application=application,
@@ -134,5 +137,5 @@ class ApplicationSerializer(serializers.ModelSerializer):
                     application=application,
                     **product_data
                 )
-        
+
         return application

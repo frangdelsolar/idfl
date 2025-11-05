@@ -7,20 +7,169 @@ from application.models import (
     ApplicationProduct, 
     BulkSubmission
 )
+from customer.models import Company, Address, SupplyChainCompany, CertificationBody, CustomerProfile
+
+def create_company_info():
+    """Create dummy company data for testing and demonstration."""
+    
+    # Create addresses first
+    address1 = Address.objects.create(
+        address="123 Green Street",
+        city="Portland",
+        state="Oregon",
+        zip_code="97205",
+        country="United States"
+    )
+    
+    address2 = Address.objects.create(
+        address="456 Eco Avenue",
+        city="Seattle",
+        state="Washington",
+        zip_code="98101",
+        country="United States"
+    )
+    
+    address3 = Address.objects.create(
+        address="789 Sustainable Lane",
+        city="Austin",
+        state="Texas",
+        zip_code="73301",
+        country="United States"
+    )
+    
+    address4 = Address.objects.create(
+        address="321 Innovation Drive",
+        city="San Francisco",
+        state="California",
+        zip_code="94107",
+        country="United States"
+    )
+    
+    # Create companies
+    company1 = Company.objects.create(
+        name="EcoFiber Textiles Inc.",
+        address=address1
+    )
+    
+    company2 = Company.objects.create(
+        name="Sustainable Materials Co.",
+        address=address2
+    )
+    
+    company3 = Company.objects.create(
+        name="Green Manufacturing Partners",
+        address=address3
+    )
+    
+    company4 = Company.objects.create(
+        name="BioTech Fabrics Corp.",
+        address=address4
+    )
+    
+    # Create supply chain companies
+    supply_company1 = SupplyChainCompany.objects.create(
+        name="Organic Cotton Co-op",
+        is_valid=True,
+        address=address1
+    )
+    
+    supply_company2 = SupplyChainCompany.objects.create(
+        name="Recycled Polyester Ltd.",
+        is_valid=True,
+        address=address2
+    )
+    
+    supply_company3 = SupplyChainCompany.objects.create(
+        name="Natural Dyes International",
+        is_valid=False,
+        address=address3
+    )
+    
+    supply_company4 = SupplyChainCompany.objects.create(
+        name="Sustainable Packaging Solutions",
+        is_valid=True,
+        address=address4
+    )
+    
+    # Create certification bodies
+    cert_body1 = CertificationBody.objects.create(
+        name="Global Organic Textile Standard (GOTS)",
+        address=address1
+    )
+    
+    cert_body2 = CertificationBody.objects.create(
+        name="Fair Trade Certified",
+        address=address2
+    )
+    
+    cert_body3 = CertificationBody.objects.create(
+        name="Cradle to Cradle Certified",
+        address=address3
+    )
+    
+    # Create some customer profiles
+    User = get_user_model()
+    
+    # Create demo users if they don't exist
+    demo_user1, created = User.objects.get_or_create(
+        username="demo_customer1",
+        defaults={
+            'email': 'customer1@ecofiber.com',
+            'first_name': 'John',
+            'last_name': 'Greenfield',
+            'is_active': True
+        }
+    )
+    demo_user1.set_password('demo123')
+    demo_user1.save()
+    
+    demo_user2, created = User.objects.get_or_create(
+        username="demo_customer2",
+        defaults={
+            'email': 'customer2@sustainable.com',
+            'first_name': 'Sarah',
+            'last_name': 'Ecofield',
+            'is_active': True
+        }
+    )
+    demo_user2.set_password('demo123')
+    demo_user2.save()
+    
+    # Add users to companies
+    company1.users.add(demo_user1)
+    company2.users.add(demo_user2)
+    
+    # Create customer profiles
+    customer_profile1 = CustomerProfile.objects.create(
+        user=demo_user1,
+        company=company1,
+        phone_number="+1-503-555-0101"
+    )
+    
+    customer_profile2 = CustomerProfile.objects.create(
+        user=demo_user2,
+        company=company2,
+        phone_number="+1-206-555-0102"
+    )
+    
+    return {
+        'companies': [company1, company2, company3, company4],
+        'supply_chain_companies': [supply_company1, supply_company2, supply_company3, supply_company4],
+        'certification_bodies': [cert_body1, cert_body2, cert_body3],
+        'customer_profiles': [customer_profile1, customer_profile2],
+        'addresses': [address1, address2, address3, address4]
+    }
 
 def create_dummy_bulk_submissions():
     """Create dummy bulk submissions with applications."""
-
     application_file = "application_files/application_form.xlsx"
     
-    # Bulk Submission 1: Draft with multiple applications
     draft_submission = BulkSubmission.objects.create(
         name="📦 BULK - Q4 Sustainability Applications Batch",
         description="Quarter 4 sustainability certification applications from various textile companies",
         status=BulkSubmission.Status.DRAFT
     )
     
-    # Create applications for draft submission
     app1 = Application.objects.create(
         name="BULK - EcoWear Collective - Fall Collection",
         description="Sustainable fall fashion line using organic cotton and recycled materials",
@@ -37,7 +186,6 @@ def create_dummy_bulk_submissions():
         file=application_file
     )
     
-    # Bulk Submission 2: Processing submission
     processing_submission = BulkSubmission.objects.create(
         name="🚀 BULK - Active Processing - Textile Partners",
         description="Currently processing applications from supply chain partners",
@@ -52,7 +200,6 @@ def create_dummy_bulk_submissions():
         file=application_file
     )
     
-    # Bulk Submission 3: Successful submission
     success_submission = BulkSubmission.objects.create(
         name="✅ BULK - Completed - Q3 Approvals",
         description="Successfully processed and approved Q3 applications",
@@ -75,7 +222,6 @@ def create_dummy_bulk_submissions():
         file=application_file
     )
     
-    # Bulk Submission 4: Failed submission
     failed_submission = BulkSubmission.objects.create(
         name="❌ BULK - Failed - Compliance Issues",
         description="Batch failed due to documentation and compliance problems",
@@ -89,20 +235,12 @@ def create_dummy_bulk_submissions():
         description="Application with multiple compliance violations",
         status=Application.Status.REJECTED,
         bulk_submissions=failed_submission
-        # No file for the rejected application
     )
     
-    return [
-        draft_submission,
-        processing_submission, 
-        success_submission,
-        failed_submission
-    ]
+    return [draft_submission, processing_submission, success_submission, failed_submission]
 
 def create_to_be_submitted_application():
     """Create a dummy application for Customer Service to submit."""
-    User = get_user_model()
-    
     application = Application.objects.create(
         name="📝 TO BE SUBMITTED - Fresh Start Apparel Application",
         description="New application ready for Customer Service review and submission.",
@@ -167,8 +305,6 @@ def create_to_be_submitted_application():
 
 def create_to_be_approved_application():
     """Create a dummy application that will be easily approved."""
-    User = get_user_model()
-    
     application = Application.objects.create(
         name="✅ TO BE APPROVED - EcoFiber Textiles Application",
         description="Well-prepared application with all sustainable materials and proper documentation.",
@@ -240,8 +376,6 @@ def create_to_be_approved_application():
 
 def create_to_be_rejected_application():
     """Create a dummy application that will be rejected."""
-    User = get_user_model()
-    
     application = Application.objects.create(
         name="❌ TO BE REJECTED - BioTech Fabrics Application",
         description="Application with several compliance issues including non-approved materials.",
@@ -325,9 +459,18 @@ def create_to_be_rejected_application():
 
 def create_dummy_data():
     """Create dummy data for testing and demonstration."""
+    company_data = create_company_info()
     submitted_app = create_to_be_submitted_application()
     approved_app = create_to_be_approved_application()
     rejected_app = create_to_be_rejected_application()
     bulk_submissions = create_dummy_bulk_submissions()
     
-    return submitted_app, approved_app, rejected_app, bulk_submissions
+    return {
+        'company_data': company_data,
+        'applications': {
+            'submitted': submitted_app,
+            'approved': approved_app,
+            'rejected': rejected_app
+        },
+        'bulk_submissions': bulk_submissions
+    }

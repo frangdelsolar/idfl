@@ -85,6 +85,35 @@ def setup_reviewer_user():
     
     return reviewer_user
 
+def setup_customer_user():
+    """
+    Setup Customer user.
+    
+    Creates:
+    - customer / customer (Customer role)
+    
+    Returns:
+        User: Customer user object
+    """
+    User = get_user_model()
+    
+    # Get the Customer group
+    customer_group = Group.objects.get(name='Customer')
+    
+    customer_user, created = User.objects.get_or_create(
+        username='customer',
+        defaults={
+            'email': 'customer@example.com',
+            'is_staff': False  # Customers typically are not staff
+        }
+    )
+    if created:
+        customer_user.set_password('customer')
+        customer_user.save()
+        customer_user.groups.add(customer_group)
+    
+    return customer_user
+
 def setup_users():
     """
     Setup all default users.
@@ -92,10 +121,11 @@ def setup_users():
     Convenience function that calls all individual user setup functions.
     
     Returns:
-        tuple: (admin_user, customer_service_user, reviewer_user) User objects
+        tuple: (admin_user, customer_service_user, reviewer_user, customer_user) User objects
     """
     admin_user = setup_admin_user()
     customer_service_user = setup_customer_service_user()
     reviewer_user = setup_reviewer_user()
+    customer_user = setup_customer_user()
     
-    return admin_user, customer_service_user, reviewer_user
+    return admin_user, customer_service_user, reviewer_user, customer_user
