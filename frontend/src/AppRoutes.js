@@ -1,11 +1,18 @@
-import { useRoutes, Navigate } from 'react-router-dom'; // Add Navigate
+import { useRoutes, Navigate } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
+import UnauthorizedPage from './layouts/UnauthorizedPage';
 import authRoutes from './layouts/auth/AuthRoutes';
+import customerServiceRoutes from './layouts/customerService/CustomerServiceRoutes';
+import customerRoutes from './layouts/customer/CustomerRoutes';
 
-// Define the base routes array
-export const ROUTES = [authRoutes];
+/**
+ * Combined application routes organized by user role and functionality
+ */
+export const ROUTES = [authRoutes, customerServiceRoutes, customerRoutes];
 
-// Create a new array including the catch-all fallback route
+/**
+ * Complete route configuration including fallback and error handling
+ */
 const ROUTES_WITH_FALLBACK = [
     {
         path: '/',
@@ -13,7 +20,10 @@ const ROUTES_WITH_FALLBACK = [
         children: [
             ...ROUTES,
             {
-                // The '*' path will match any URL not matched by the preceding routes
+                path: '/unauthorized',
+                element: <UnauthorizedPage />,
+            },
+            {
                 path: '*',
                 element: <Navigate to="/" replace />,
             },
@@ -21,8 +31,11 @@ const ROUTES_WITH_FALLBACK = [
     },
 ];
 
+/**
+ * Main application router component
+ * Handles route resolution and navigation
+ */
 function AppRoutes() {
-    // Use the augmented array
     const elements = useRoutes(ROUTES_WITH_FALLBACK);
     return <>{elements}</>;
 }

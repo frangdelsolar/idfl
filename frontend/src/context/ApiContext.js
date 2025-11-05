@@ -1,25 +1,57 @@
-import React, {
-    createContext,
-    useContext,
-    useState,
-    useEffect,
-    useMemo,
-} from 'react';
+import React, { createContext, useContext, useState, useMemo } from 'react';
 import createApiClient from '../services/apiClient';
 import createAuthService from '../services/authService';
 import createApplicationService from '../services/applicationService';
+import createCompanyService from '../services/companyService';
+import createCustomerProfileService from '../services/customerProfileService';
 
 const BASE_URL = 'http://localhost:8000';
 const API_BASE_URL = `${BASE_URL}/api`;
 
 /**
- * Context for API client and authentication state management
+ * Detects user role based on username patterns for demo purposes
+ * In production, roles should come from the backend authentication response
  */
+const detectRoleFromUsername = (username) => {
+    if (!username) return null;
+
+    const usernameLower = username.toLowerCase();
+
+    if (
+        usernameLower.includes('cservice') ||
+        usernameLower.includes('customer_service') ||
+        usernameLower.includes('support') ||
+        usernameLower.includes('agent')
+    ) {
+        return 'cservice';
+    }
+
+    if (
+        usernameLower.includes('customer') ||
+        usernameLower.includes('client') ||
+        usernameLower.includes('user') ||
+        usernameLower.startsWith('cust_')
+    ) {
+        return 'customer';
+    }
+
+    if (
+        usernameLower.includes('reviewer') ||
+        usernameLower.includes('admin') ||
+        usernameLower.includes('manager') ||
+        usernameLower.includes('approver')
+    ) {
+        return 'reviewer';
+    }
+
+    return 'customer';
+};
+
 const ApiContext = createContext(null);
 
 /**
  * Hook to access API services and authentication state
- * @returns {Object} API services and authentication methods
+ * @throws {Error} If used outside of ApiProvider
  */
 export const useApi = () => {
     const context = useContext(ApiContext);
@@ -30,15 +62,18 @@ export const useApi = () => {
 };
 
 /**
- * Provider component that manages authentication state and API services
- * @param {Object} props - Component props
- * @param {ReactNode} props.children - Child components
+ * Main API context provider that manages:
+ * - Authentication state and token management
+ * - API service instances
+ * - User role detection and session persistence
  */
 export const ApiProvider = ({ children }) => {
     const [token, setToken] = useState(localStorage.getItem('authToken'));
+    const [user, setUser] = useState(null);
 
     /**
-     * Memoized API services with authentication state management
+     * Memoized service instances that depend on authentication state
+     * Recreates services only when token or user changes
      */
     const services = useMemo(() => {
         const apiClient = createApiClient({
@@ -51,7 +86,14 @@ export const ApiProvider = ({ children }) => {
             apiClient.executeApiCall
         );
         const applications = createApplicationService(apiClient.executeApiCall);
+        const companies = createCompanyService(apiClient.executeApiCall);
+        const customerProfiles = createCustomerProfileService(
+            apiClient.executeApiCall
+        );
 
+        /**
+         * Enhanced authentication service with role detection and state management
+         */
         const enhancedAuth = {
             login: async (username, password) => {
                 const data = await baseAuthService.login(username, password);
@@ -59,22 +101,38 @@ export const ApiProvider = ({ children }) => {
                 if (newToken) {
                     setToken(newToken);
                     localStorage.setItem('authToken', newToken);
+
+                    const detectedRole = detectRoleFromUsername(username);
+                    console.log(
+                        `User ${username} logged in, detected role: ${detectedRole}`
+                    );
+
+                    setUser({
+                        username: username,
+                        role: detectedRole,
+                    });
                 }
                 return data;
             },
             logout: () => {
                 setToken(null);
+                setUser(null);
                 localStorage.removeItem('authToken');
+                console.log('User logged out');
             },
             register: baseAuthService.register,
             isAuthenticated: !!token,
+            user: user,
+            isInitialized: true,
         };
 
         return {
             auth: enhancedAuth,
             applications,
+            companies,
+            customerProfiles,
         };
-    }, [token]);
+    }, [token, user]);
 
     return (
         <ApiContext.Provider value={services}>{children}</ApiContext.Provider>
