@@ -14,6 +14,7 @@ This project implements a comprehensive Django web application for managing prod
       - [Data \& Configuration](#data--configuration)
       - [Development \& Deployment](#development--deployment)
       - [Django Apps](#django-apps)
+      - [Frontend](#frontend)
   - [✅ Tasks Completed](#-tasks-completed)
     - [Task 1: Create Customer Models, Product Models and Seed Initial Data - ✅ Completed](#task-1-create-customer-models-product-models-and-seed-initial-data----completed)
       - [Core Models Created](#core-models-created)
@@ -116,6 +117,10 @@ The project is structured as follows:
 -   `product/` - Product models, data import commands
 -   `customer/` - Company & user management
 -   `core/` - User roles, utilities, setup commands
+
+#### Frontend
+
+-   `frontend/` - React app for customer-facing interface
 
 ## ✅ Tasks Completed
 
@@ -392,10 +397,12 @@ make frontend
 
 ## 🎯 Final Thoughts
 
-This was a genuinely engaging project to work on - building a complete certification platform from scratch presented interesting architectural challenges and allowed me to design a robust system with real-world applicability.
+This was a genuinely engaging project to work on - building a complete certification platform from scratch presented interesting architectural challenges and allowed me to design a robust system in a short amount of time.
 
-I want to acknowledge that much of the code was created with AI assistance, which served as an incredibly productive pair-programming partner. However, I actively supervised every single line of code - reviewing, testing, and refining the output - just as I would when leading a development team in a professional environment.
+I want to acknowledge that much of the code was created with AI assistance, which served as an incredibly productive pair-programming partner. However, I actively supervised every single line of code - reviewing, testing, and refining the output - just as I would when working with a development team in a professional setting.
 
-The scope of implementing all five tasks (including optional API and background processing features) within a reasonable timeframe would have been significantly more challenging without this tool. It allowed me to focus on system architecture, user experience, and business logic rather than getting bogged down in boilerplate code.
+The scope of implementing the six tasks within a reasonable timeframe would have been significantly more challenging without this tool. It allowed me to focus on system architecture, user experience, and business logic rather than getting bogged down in boilerplate code.
 
-The end result is a fully functional, well-documented application that demonstrates comprehensive understanding of Django, REST APIs, and enterprise workflow design - exactly what was requested in the exercise.
+The end result is a fully functional (with some limitations), well-documented application that showcases my ability to design and implement complex systems effectively. I hope you find the project enjoyable and inspiring, and I look forward to the opportunity to collaborate with you on future projects.
+
+**_Thanks for reading!_**
